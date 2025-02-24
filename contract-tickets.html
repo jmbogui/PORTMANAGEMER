@@ -1,0 +1,182 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Boletos de Contratación</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .ticket {
+            border: 2px dashed #4a5568;
+            padding: 16px;
+            margin: 16px 0;
+            background-color: #f7fafc;
+        }
+        .ticket-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .ticket-content {
+            margin-top: 8px;
+        }
+        .ticket-content p {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Boletos de Contratación</h1>
+    <div id="ticketContainer">
+        <!-- Los boletos de contratación se generarán aquí -->
+    </div>
+    <button onclick="generateTicket()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Generar Boleto de Contratación
+    </button>
+
+    <script>
+        let shifts = [
+            {
+                id: 101,
+                date: "2025-02-25",
+                time: "08-14",
+                shipName: "Barco A",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" },
+                    { name: "Carlos García", specialty: "Gruista" }
+                ]
+            },
+            {
+                id: 102,
+                date: "2025-02-25",
+                time: "14-20",
+                shipName: "Barco B",
+                workers: [
+                    { name: "Ana Torres", specialty: "Amantero" },
+                    { name: "Luis Fernández", specialty: "Carretillero" },
+                    { name: "Sofía Martínez", specialty: "Mafista" }
+                ]
+            }
+        ];
+
+        function generateTicket() {
+            const ticketContainer = document.getElementById('ticketContainer');
+            ticketContainer.innerHTML = ''; // Limpia los boletos anteriores
+
+            shifts.forEach(shift => {
+                const ticket = document.createElement('div');
+                ticket.className = 'ticket';
+
+                ticket.innerHTML = `
+                    <div class="ticket-header">Boleto de Contratación - ID: ${shift.id}</div>
+                    <div class="ticket-content">
+                        <p><strong>Barco:</strong> ${shift.shipName}</p>
+                        <p><strong>Fecha:</strong> ${shift.date}</p>
+                        <p><strong>Jornada:</strong> ${shift.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul>
+                            ${shift.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                ticketContainer.appendChild(ticket);
+            });
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Boletos de Contratación</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .ticket {
+            border: 2px dashed #4a5568;
+            padding: 16px;
+            margin: 16px 0;
+            background-color: #f7fafc;
+        }
+        .ticket-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .ticket-content {
+            margin-top: 8px;
+        }
+        .ticket-content p {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Boletos de Contratación</h1>
+    <div id="ticketContainer">
+        <!-- Los boletos de contratación se generarán aquí -->
+    </div>
+    <button onclick="generateTicket()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Generar Boleto de Contratación
+    </button>
+
+    <script>
+        let shifts = [
+            {
+                id: 101,
+                date: "2025-02-25",
+                time: "08-14",
+                shipName: "Barco A",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" },
+                    { name: "Carlos García", specialty: "Gruista" }
+                ]
+            },
+            {
+                id: 102,
+                date: "2025-02-25",
+                time: "14-20",
+                shipName: "Barco B",
+                workers: [
+                    { name: "Ana Torres", specialty: "Amantero" },
+                    { name: "Luis Fernández", specialty: "Carretillero" },
+                    { name: "Sofía Martínez", specialty: "Mafista" }
+                ]
+            }
+        ];
+
+        function generateTicket() {
+            const ticketContainer = document.getElementById('ticketContainer');
+            ticketContainer.innerHTML = ''; // Limpia los boletos anteriores
+
+            shifts.forEach(shift => {
+                const ticket = document.createElement('div');
+                ticket.className = 'ticket';
+
+                ticket.innerHTML = `
+                    <div class="ticket-header">Boleto de Contratación - ID: ${shift.id}</div>
+                    <div class="ticket-content">
+                        <p><strong>Barco:</strong> ${shift.shipName}</p>
+                        <p><strong>Fecha:</strong> ${shift.date}</p>
+                        <p><strong>Jornada:</strong> ${shift.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul>
+                            ${shift.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                ticketContainer.appendChild(ticket);
+            });
+        }
+    </script>
+</body>
+</html>
+```
