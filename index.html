@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,18 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortManager</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
 </head>
 <body class="bg-gray-100">
+    <!-- Página de Login -->
     <div id="loginPage" class="min-h-screen flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-            <h2 class="text-3xl font-bold text-blue-900 text-center mb-6">PortManager</h2>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-blue-900">PortManager</h2>
+                <p class="text-gray-600">Sistema de Gestión Portuaria</p>
+            </div>
             <div class="space-y-4">
-                <input type="text" id="username" placeholder="Usuario" 
+                <input type="text" id="username" placeholder="Usuario"
                        class="w-full p-2 border rounded">
-                <input type="password" id="password" placeholder="Contraseña" 
+                <input type="password" id="password" placeholder="Contraseña"
                        class="w-full p-2 border rounded">
-                <button onclick="login()" 
+                <select id="role" class="w-full p-2 border rounded">
+                    <option value="admin">Administrador</option>
+                    <option value="empresa">Empresa Estibadora</option>
+                    <option value="estibador">Estibador</option>
+                </select>
+                <button onclick="login()"
                         class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
                     Iniciar Sesión
                 </button>
@@ -24,11 +37,54 @@
         </div>
     </div>
 
-    <div id="dashboardPage" class="hidden">
-        <!-- Aquí irá el dashboard -->
+    <!-- Dashboard del Administrador -->
+    <div id="adminDashboard" class="hidden">
+        <h1 class="text-2xl font-bold text-center mt-8">Dashboard del Administrador</h1>
+        <button onclick="logout()" class="mt-4 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Dashboard de Empresas Estibadoras -->
+    <div id="empresaDashboard" class="hidden">
+        <h1 class="text-2xl font-bold text-center mt-8">Dashboard de Empresas Estibadoras</h1>
+        <button onclick="logout()" class="mt-4 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
+    </div>
+
+    <!-- Dashboard de Estibadores -->
+    <div id="estibadorDashboard" class="hidden">
+        <h1 class="text-2xl font-bold text-center mt-8">Dashboard de Estibadores</h1>
+        <button onclick="logout()" class="mt-4 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
+    </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            if (username && password) {
+                document.getElementById('loginPage').classList.add('hidden');
+
+                if (role === 'admin') {
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                } else if (role === 'empresa') {
+                    document.getElementById('empresaDashboard').classList.remove('hidden');
+                } else if (role === 'estibador') {
+                    document.getElementById('estibadorDashboard').classList.remove('hidden');
+                }
+            } else {
+                alert('Por favor, introduce usuario, contraseña y selecciona un rol');
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('empresaDashboard').classList.add('hidden');
+            document.getElementById('estibadorDashboard').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+    </script>
 </body>
 </html>
 ```
