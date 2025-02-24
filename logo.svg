@@ -1,0 +1,40 @@
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Background Circle -->
+  <circle cx="150" cy="150" r="140" fill="#2C5282" stroke="#1A365D" stroke-width="10" />
+
+  <!-- Anchor Icon -->
+  <path d="M150 60 L165 120 L135 120 Z" fill="#F7FAFC" />
+  <rect x="145" y="120" width="10" height="80" fill="#F7FAFC" />
+  <circle cx="150" cy="200" r="25" fill="#F7FAFC" />
+  <line x1="120" y1="200" x2="180" y2="200" stroke="#F7FAFC" stroke-width="6" />
+
+  <!-- Waves -->
+  <path d="M80 240 Q100 220 120 240 T160 240 T200 240 T240 240" fill="none" stroke="#F7FAFC" stroke-width="4" />
+
+  <!-- Company Name -->
+  <text x="150" y="270" font-size="18" font-family="Arial, sans-serif" fill="#F7FAFC" text-anchor="middle">
+    CPE DEL PUERTO DE ALMERÍA
+  </text>
+</svg>
+```
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Background Circle -->
+  <circle cx="150" cy="150" r="140" fill="#2C5282" stroke="#1A365D" stroke-width="10" />
+
+  <!-- Anchor Icon -->
+  <path d="M150 60 L165 120 L135 120 Z" fill="#F7FAFC" />
+  <rect x="145" y="120" width="10" height="80" fill="#F7FAFC" />
+  <circle cx="150" cy="200" r="25" fill="#F7FAFC" />
+  <line x1="120" y1="200" x2="180" y2="200" stroke="#F7FAFC" stroke-width="6" />
+
+  <!-- Waves -->
+  <path d="M80 240 Q100 220 120 240 T160 240 T200 240 T240 240" fill="none" stroke="#F7FAFC" stroke-width="4" />
+
+  <!-- Company Name -->
+  <text x="150" y="270" font-size="18" font-family="Arial, sans-serif" fill="#F7FAFC" text-anchor="middle">
+    CPE DEL PUERTO DE ALMERÍA
+  </text>
+</svg>
+```
