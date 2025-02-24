@@ -1,0 +1,368 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Trabajadores con Base de Datos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para las fichas redondas */
+        .worker-card {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .worker-card:hover {
+            transform: scale(1.1);
+        }
+
+        /* Colores según el estado */
+        .available-single { background-color: #4CAF50; } /* Verde */
+        .available-double { background-color: #2196F3; } /* Azul */
+        .on-vacation { background-color: #FFC107; } /* Amarillo */
+        .monthly-permit { background-color: #FF9800; } /* Naranja */
+        .on-leave { background-color: #F44336; } /* Rojo */
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.2s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Estado de Trabajadores con Base de Datos</h1>
+
+        <!-- Categoría: Turno Sencillo -->
+        <div id="workerContainer" class="mb-8">
+            <h2 class="text-lg font-bold mb-4">Trabajadores</h2>
+            <div class="flex flex-wrap gap-4" id="workerCards">
+                <!-- Las fichas de trabajadores se generarán dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Modal para editar información -->
+        <div id="workerModal" class="modal">
+            <div class="modal-content">
+                <h2 class="text-lg font-bold mb-4">Editar Información del Trabajador</h2>
+                <form id="workerForm">
+                    <div class="mb-4">
+                        <label for="workerName" class="block text-sm font-bold mb-2">Nombre:</label>
+                        <input type="text" id="workerName" class="w-full border border-gray-300 rounded px-3 py-2" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="workerStatus" class="block text-sm font-bold mb-2">Estado:</label>
+                        <select id="workerStatus" class="w-full border border-gray-300 rounded px-3 py-2">
+                            <option value="available-single">Disponible (Turno Sencillo)</option>
+                            <option value="available-double">Disponible (Turno Doble)</option>
+                            <option value="on-vacation">Vacaciones</option>
+                            <option value="monthly-permit">Permiso Mensual</option>
+                            <option value="on-leave">Baja Laboral</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveWorkerInfo()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de base de datos (JSON)
+        let workers = [
+            { id: 101, name: "Juan Pérez", status: "available-single" },
+            { id: 102, name: "María López", status: "available-double" },
+            { id: 103, name: "Carlos García", status: "on-vacation" }
+        ];
+
+        let currentWorkerId = null;
+
+        // Cargar trabajadores al iniciar
+        function loadWorkers() {
+            const workerCards = document.getElementById("workerCards");
+            workerCards.innerHTML = ""; // Limpiar contenedor
+
+            workers.forEach(worker => {
+                const workerCard = document.createElement("div");
+                workerCard.className = `worker-card ${worker.status}`;
+                workerCard.textContent = worker.id;
+                workerCard.title = `Trabajador ${worker.id} - ${worker.name}`;
+                workerCard.onclick = () => openModal(worker.id);
+                workerCards.appendChild(workerCard);
+            });
+        }
+
+        // Abrir modal
+        function openModal(workerId) {
+            currentWorkerId = workerId;
+            const worker = workers.find(w => w.id === workerId);
+            document.getElementById("workerName").value = worker.name;
+            document.getElementById("workerStatus").value = worker.status;
+            document.getElementById("workerModal").classList.add("active");
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById("workerModal").classList.remove("active");
+        }
+
+        // Guardar información del trabajador
+        function saveWorkerInfo() {
+            const name = document.getElementById("workerName").value;
+            const status = document.getElementById("workerStatus").value;
+
+            if (currentWorkerId) {
+                const worker = workers.find(w => w.id === currentWorkerId);
+                worker.name = name;
+                worker.status = status;
+
+                // Guardar cambios en la "base de datos"
+                saveToDatabase();
+
+                // Recargar visualización
+                loadWorkers();
+            }
+
+            closeModal();
+        }
+
+        // Guardar datos en la "base de datos" (simulada)
+        function saveToDatabase() {
+            localStorage.setItem("workers", JSON.stringify(workers));
+        }
+
+        // Cargar datos desde la "base de datos" (simulada)
+        function loadFromDatabase() {
+            const savedWorkers = localStorage.getItem("workers");
+            if (savedWorkers) {
+                workers = JSON.parse(savedWorkers);
+            }
+        }
+
+        // Inicializar
+        loadFromDatabase();
+        loadWorkers();
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Trabajadores con Base de Datos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para las fichas redondas */
+        .worker-card {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .worker-card:hover {
+            transform: scale(1.1);
+        }
+
+        /* Colores según el estado */
+        .available-single { background-color: #4CAF50; } /* Verde */
+        .available-double { background-color: #2196F3; } /* Azul */
+        .on-vacation { background-color: #FFC107; } /* Amarillo */
+        .monthly-permit { background-color: #FF9800; } /* Naranja */
+        .on-leave { background-color: #F44336; } /* Rojo */
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.2s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Estado de Trabajadores con Base de Datos</h1>
+
+        <!-- Categoría: Turno Sencillo -->
+        <div id="workerContainer" class="mb-8">
+            <h2 class="text-lg font-bold mb-4">Trabajadores</h2>
+            <div class="flex flex-wrap gap-4" id="workerCards">
+                <!-- Las fichas de trabajadores se generarán dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Modal para editar información -->
+        <div id="workerModal" class="modal">
+            <div class="modal-content">
+                <h2 class="text-lg font-bold mb-4">Editar Información del Trabajador</h2>
+                <form id="workerForm">
+                    <div class="mb-4">
+                        <label for="workerName" class="block text-sm font-bold mb-2">Nombre:</label>
+                        <input type="text" id="workerName" class="w-full border border-gray-300 rounded px-3 py-2" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="workerStatus" class="block text-sm font-bold mb-2">Estado:</label>
+                        <select id="workerStatus" class="w-full border border-gray-300 rounded px-3 py-2">
+                            <option value="available-single">Disponible (Turno Sencillo)</option>
+                            <option value="available-double">Disponible (Turno Doble)</option>
+                            <option value="on-vacation">Vacaciones</option>
+                            <option value="monthly-permit">Permiso Mensual</option>
+                            <option value="on-leave">Baja Laboral</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveWorkerInfo()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de base de datos (JSON)
+        let workers = [
+            { id: 101, name: "Juan Pérez", status: "available-single" },
+            { id: 102, name: "María López", status: "available-double" },
+            { id: 103, name: "Carlos García", status: "on-vacation" }
+        ];
+
+        let currentWorkerId = null;
+
+        // Cargar trabajadores al iniciar
+        function loadWorkers() {
+            const workerCards = document.getElementById("workerCards");
+            workerCards.innerHTML = ""; // Limpiar contenedor
+
+            workers.forEach(worker => {
+                const workerCard = document.createElement("div");
+                workerCard.className = `worker-card ${worker.status}`;
+                workerCard.textContent = worker.id;
+                workerCard.title = `Trabajador ${worker.id} - ${worker.name}`;
+                workerCard.onclick = () => openModal(worker.id);
+                workerCards.appendChild(workerCard);
+            });
+        }
+
+        // Abrir modal
+        function openModal(workerId) {
+            currentWorkerId = workerId;
+            const worker = workers.find(w => w.id === workerId);
+            document.getElementById("workerName").value = worker.name;
+            document.getElementById("workerStatus").value = worker.status;
+            document.getElementById("workerModal").classList.add("active");
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById("workerModal").classList.remove("active");
+        }
+
+        // Guardar información del trabajador
+        function saveWorkerInfo() {
+            const name = document.getElementById("workerName").value;
+            const status = document.getElementById("workerStatus").value;
+
+            if (currentWorkerId) {
+                const worker = workers.find(w => w.id === currentWorkerId);
+                worker.name = name;
+                worker.status = status;
+
+                // Guardar cambios en la "base de datos"
+                saveToDatabase();
+
+                // Recargar visualización
+                loadWorkers();
+            }
+
+            closeModal();
+        }
+
+        // Guardar datos en la "base de datos" (simulada)
+        function saveToDatabase() {
+            localStorage.setItem("workers", JSON.stringify(workers));
+        }
+
+        // Cargar datos desde la "base de datos" (simulada)
+        function loadFromDatabase() {
+            const savedWorkers = localStorage.getItem("workers");
+            if (savedWorkers) {
+                workers = JSON.parse(savedWorkers);
+            }
+        }
+
+        // Inicializar
+        loadFromDatabase();
+        loadWorkers();
+    </script>
+</body>
+</html>
+```
