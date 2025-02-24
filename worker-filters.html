@@ -1,0 +1,222 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtros Dinámicos para Trabajadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .worker-card {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .worker-card:hover {
+            transform: scale(1.1);
+        }
+
+        .available-single { background-color: #4CAF50; }
+        .available-double { background-color: #2196F3; }
+        .on-vacation { background-color: #FFC107; }
+        .monthly-permit { background-color: #FF9800; }
+        .on-leave { background-color: #F44336; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Filtros Dinámicos para Trabajadores</h1>
+
+        <!-- Filtros -->
+        <div class="mb-6 flex flex-wrap gap-4">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Buscar por nombre..." 
+                class="w-full md:w-1/3 border border-gray-300 rounded px-3 py-2"
+                oninput="applyFilters()"
+            />
+            <select 
+                id="statusFilter" 
+                class="w-full md:w-1/3 border border-gray-300 rounded px-3 py-2"
+                onchange="applyFilters()"
+            >
+                <option value="">Filtrar por estado</option>
+                <option value="available-single">Disponible (Turno Sencillo)</option>
+                <option value="available-double">Disponible (Turno Doble)</option>
+                <option value="on-vacation">Vacaciones</option>
+                <option value="monthly-permit">Permiso Mensual</option>
+                <option value="on-leave">Baja Laboral</option>
+            </select>
+        </div>
+
+        <!-- Trabajadores -->
+        <div id="workerContainer" class="flex flex-wrap gap-4">
+            <!-- Las fichas de trabajadores se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        // Simulación de base de datos
+        let workers = [
+            { id: 101, name: "Juan Pérez", status: "available-single" },
+            { id: 102, name: "María López", status: "available-double" },
+            { id: 103, name: "Carlos García", status: "on-vacation" },
+            { id: 104, name: "Ana Torres", status: "monthly-permit" },
+            { id: 105, name: "Luis Fernández", status: "on-leave" }
+        ];
+
+        // Cargar trabajadores al iniciar
+        function loadWorkers(filteredWorkers = workers) {
+            const workerContainer = document.getElementById("workerContainer");
+            workerContainer.innerHTML = ""; // Limpiar contenedor
+
+            filteredWorkers.forEach(worker => {
+                const workerCard = document.createElement("div");
+                workerCard.className = `worker-card ${worker.status}`;
+                workerCard.textContent = worker.id;
+                workerCard.title = `Trabajador ${worker.id} - ${worker.name}`;
+                workerContainer.appendChild(workerCard);
+            });
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const statusFilter = document.getElementById("statusFilter").value;
+
+            const filteredWorkers = workers.filter(worker => {
+                const matchesName = worker.name.toLowerCase().includes(searchInput);
+                const matchesStatus = statusFilter ? worker.status === statusFilter : true;
+                return matchesName && matchesStatus;
+            });
+
+            loadWorkers(filteredWorkers);
+        }
+
+        // Inicializar
+        loadWorkers();
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtros Dinámicos para Trabajadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .worker-card {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .worker-card:hover {
+            transform: scale(1.1);
+        }
+
+        .available-single { background-color: #4CAF50; }
+        .available-double { background-color: #2196F3; }
+        .on-vacation { background-color: #FFC107; }
+        .monthly-permit { background-color: #FF9800; }
+        .on-leave { background-color: #F44336; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Filtros Dinámicos para Trabajadores</h1>
+
+        <!-- Filtros -->
+        <div class="mb-6 flex flex-wrap gap-4">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Buscar por nombre..."
+                class="w-full md:w-1/3 border border-gray-300 rounded px-3 py-2"
+                oninput="applyFilters()"
+            />
+            <select
+                id="statusFilter"
+                class="w-full md:w-1/3 border border-gray-300 rounded px-3 py-2"
+                onchange="applyFilters()"
+            >
+                <option value="">Filtrar por estado</option>
+                <option value="available-single">Disponible (Turno Sencillo)</option>
+                <option value="available-double">Disponible (Turno Doble)</option>
+                <option value="on-vacation">Vacaciones</option>
+                <option value="monthly-permit">Permiso Mensual</option>
+                <option value="on-leave">Baja Laboral</option>
+            </select>
+        </div>
+
+        <!-- Trabajadores -->
+        <div id="workerContainer" class="flex flex-wrap gap-4">
+            <!-- Las fichas de trabajadores se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        // Simulación de base de datos
+        let workers = [
+            { id: 101, name: "Juan Pérez", status: "available-single" },
+            { id: 102, name: "María López", status: "available-double" },
+            { id: 103, name: "Carlos García", status: "on-vacation" },
+            { id: 104, name: "Ana Torres", status: "monthly-permit" },
+            { id: 105, name: "Luis Fernández", status: "on-leave" }
+        ];
+
+        // Cargar trabajadores al iniciar
+        function loadWorkers(filteredWorkers = workers) {
+            const workerContainer = document.getElementById("workerContainer");
+            workerContainer.innerHTML = ""; // Limpiar contenedor
+
+            filteredWorkers.forEach(worker => {
+                const workerCard = document.createElement("div");
+                workerCard.className = `worker-card ${worker.status}`;
+                workerCard.textContent = worker.id;
+                workerCard.title = `Trabajador ${worker.id} - ${worker.name}`;
+                workerContainer.appendChild(workerCard);
+            });
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const statusFilter = document.getElementById("statusFilter").value;
+
+            const filteredWorkers = workers.filter(worker => {
+                const matchesName = worker.name.toLowerCase().includes(searchInput);
+                const matchesStatus = statusFilter ? worker.status === statusFilter : true;
+                return matchesName && matchesStatus;
+            });
+
+            loadWorkers(filteredWorkers);
+        }
+
+        // Inicializar
+        loadWorkers();
+    </script>
+</body>
+</html>
+```
