@@ -1,0 +1,304 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Trabajadores con Edición</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para las fichas redondas */
+        .worker-card {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .worker-card:hover {
+            transform: scale(1.1);
+        }
+
+        /* Colores según el estado */
+        .available-single { background-color: #4CAF50; } /* Verde */
+        .available-double { background-color: #2196F3; } /* Azul */
+        .on-vacation { background-color: #FFC107; } /* Amarillo */
+        .monthly-permit { background-color: #FF9800; } /* Naranja */
+        .on-leave { background-color: #F44336; } /* Rojo */
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.2s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Estado de Trabajadores con Edición</h1>
+
+        <!-- Categoría: Turno Sencillo -->
+        <div class="mb-8">
+            <h2 class="text-lg font-bold mb-4">Turno Sencillo</h2>
+            <div class="flex flex-wrap gap-4">
+                <div class="worker-card available-single" onclick="openModal(101)" title="Trabajador 101 - Disponible para turno sencillo">101</div>
+                <div class="worker-card available-single" onclick="openModal(102)" title="Trabajador 102 - Disponible para turno sencillo">102</div>
+                <div class="worker-card available-single" onclick="openModal(103)" title="Trabajador 103 - Disponible para turno sencillo">103</div>
+            </div>
+        </div>
+
+        <!-- Modal para editar información -->
+        <div id="workerModal" class="modal">
+            <div class="modal-content">
+                <h2 class="text-lg font-bold mb-4">Editar Información del Trabajador</h2>
+                <form id="workerForm">
+                    <div class="mb-4">
+                        <label for="workerName" class="block text-sm font-bold mb-2">Nombre:</label>
+                        <input type="text" id="workerName" class="w-full border border-gray-300 rounded px-3 py-2" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="workerStatus" class="block text-sm font-bold mb-2">Estado:</label>
+                        <select id="workerStatus" class="w-full border border-gray-300 rounded px-3 py-2">
+                            <option value="available-single">Disponible (Turno Sencillo)</option>
+                            <option value="available-double">Disponible (Turno Doble)</option>
+                            <option value="on-vacation">Vacaciones</option>
+                            <option value="monthly-permit">Permiso Mensual</option>
+                            <option value="on-leave">Baja Laboral</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveWorkerInfo()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const workers = {
+            101: { name: "Juan Pérez", status: "available-single" },
+            102: { name: "María López", status: "available-single" },
+            103: { name: "Carlos García", status: "available-single" }
+        };
+
+        let currentWorkerId = null;
+
+        // Abrir modal
+        function openModal(workerId) {
+            currentWorkerId = workerId;
+            const worker = workers[workerId];
+            document.getElementById("workerName").value = worker.name;
+            document.getElementById("workerStatus").value = worker.status;
+            document.getElementById("workerModal").classList.add("active");
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById("workerModal").classList.remove("active");
+        }
+
+        // Guardar información del trabajador
+        function saveWorkerInfo() {
+            const name = document.getElementById("workerName").value;
+            const status = document.getElementById("workerStatus").value;
+
+            if (currentWorkerId) {
+                workers[currentWorkerId].name = name;
+                workers[currentWorkerId].status = status;
+
+                // Actualizar visualización
+                const workerCard = document.querySelector(`.worker-card[onclick="openModal(${currentWorkerId})"]`);
+                workerCard.className = `worker-card ${status}`;
+                workerCard.title = `Trabajador ${currentWorkerId} - ${name}`;
+            }
+
+            closeModal();
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Trabajadores con Edición</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para las fichas redondas */
+        .worker-card {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .worker-card:hover {
+            transform: scale(1.1);
+        }
+
+        /* Colores según el estado */
+        .available-single { background-color: #4CAF50; } /* Verde */
+        .available-double { background-color: #2196F3; } /* Azul */
+        .on-vacation { background-color: #FFC107; } /* Amarillo */
+        .monthly-permit { background-color: #FF9800; } /* Naranja */
+        .on-leave { background-color: #F44336; } /* Rojo */
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.2s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Estado de Trabajadores con Edición</h1>
+
+        <!-- Categoría: Turno Sencillo -->
+        <div class="mb-8">
+            <h2 class="text-lg font-bold mb-4">Turno Sencillo</h2>
+            <div class="flex flex-wrap gap-4">
+                <div class="worker-card available-single" onclick="openModal(101)" title="Trabajador 101 - Disponible para turno sencillo">101</div>
+                <div class="worker-card available-single" onclick="openModal(102)" title="Trabajador 102 - Disponible para turno sencillo">102</div>
+                <div class="worker-card available-single" onclick="openModal(103)" title="Trabajador 103 - Disponible para turno sencillo">103</div>
+            </div>
+        </div>
+
+        <!-- Modal para editar información -->
+        <div id="workerModal" class="modal">
+            <div class="modal-content">
+                <h2 class="text-lg font-bold mb-4">Editar Información del Trabajador</h2>
+                <form id="workerForm">
+                    <div class="mb-4">
+                        <label for="workerName" class="block text-sm font-bold mb-2">Nombre:</label>
+                        <input type="text" id="workerName" class="w-full border border-gray-300 rounded px-3 py-2" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="workerStatus" class="block text-sm font-bold mb-2">Estado:</label>
+                        <select id="workerStatus" class="w-full border border-gray-300 rounded px-3 py-2">
+                            <option value="available-single">Disponible (Turno Sencillo)</option>
+                            <option value="available-double">Disponible (Turno Doble)</option>
+                            <option value="on-vacation">Vacaciones</option>
+                            <option value="monthly-permit">Permiso Mensual</option>
+                            <option value="on-leave">Baja Laboral</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveWorkerInfo()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const workers = {
+            101: { name: "Juan Pérez", status: "available-single" },
+            102: { name: "María López", status: "available-single" },
+            103: { name: "Carlos García", status: "available-single" }
+        };
+
+        let currentWorkerId = null;
+
+        // Abrir modal
+        function openModal(workerId) {
+            currentWorkerId = workerId;
+            const worker = workers[workerId];
+            document.getElementById("workerName").value = worker.name;
+            document.getElementById("workerStatus").value = worker.status;
+            document.getElementById("workerModal").classList.add("active");
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById("workerModal").classList.remove("active");
+        }
+
+        // Guardar información del trabajador
+        function saveWorkerInfo() {
+            const name = document.getElementById("workerName").value;
+            const status = document.getElementById("workerStatus").value;
+
+            if (currentWorkerId) {
+                workers[currentWorkerId].name = name;
+                workers[currentWorkerId].status = status;
+
+                // Actualizar visualización
+                const workerCard = document.querySelector(`.worker-card[onclick="openModal(${currentWorkerId})"]`);
+                workerCard.className = `worker-card ${status}`;
+                workerCard.title = `Trabajador ${currentWorkerId} - ${name}`;
+            }
+
+            closeModal();
+        }
+    </script>
+</body>
+</html>
+```
