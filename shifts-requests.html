@@ -1,0 +1,292 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Turnos y Peticiones</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos y Generación de Peticiones</h1>
+
+    <!-- Formulario para añadir turnos -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Añadir Turno</h2>
+        <form id="shiftForm" class="bg-white p-4 rounded shadow">
+            <div class="mb-4">
+                <label for="shipName" class="block text-gray-700 font-bold">Nombre del Barco:</label>
+                <input type="text" id="shipName" class="w-full border border-gray-300 p-2 rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="date" class="block text-gray-700 font-bold">Fecha:</label>
+                <input type="date" id="date" class="w-full border border-gray-300 p-2 rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="time" class="block text-gray-700 font-bold">Jornada:</label>
+                <select id="time" class="w-full border border-gray-300 p-2 rounded" required>
+                    <option value="02-08">02:00 - 08:00</option>
+                    <option value="08-14">08:00 - 14:00</option>
+                    <option value="14-20">14:00 - 20:00</option>
+                    <option value="20-02">20:00 - 02:00</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="workers" class="block text-gray-700 font-bold">Trabajadores (Nombre - Especialidad):</label>
+                <textarea id="workers" class="w-full border border-gray-300 p-2 rounded" placeholder="Ejemplo: Juan Pérez - Capataz, María López - Controlador" required></textarea>
+            </div>
+            <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">Añadir Turno</button>
+        </form>
+    </div>
+
+    <!-- Lista de peticiones generadas -->
+    <div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Peticiones Generadas</h2>
+        <div id="requestContainer" class="space-y-4">
+            <!-- Las peticiones se generarán aquí -->
+        </div>
+    </div>
+
+    <script>
+        let requests = []; // Lista de peticiones generadas
+
+        // Manejar el formulario de turnos
+        document.getElementById('shiftForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Obtener los datos del formulario
+            const shipName = document.getElementById('shipName').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const workersInput = document.getElementById('workers').value;
+
+            // Procesar los trabajadores
+            const workers = workersInput.split(',').map(worker => {
+                const [name, specialty] = worker.split('-').map(item => item.trim());
+                return { name, specialty };
+            });
+
+            // Crear una nueva petición
+            const newRequest = {
+                id: requests.length + 1, // Generar un ID único
+                shipName,
+                date,
+                time,
+                workers
+            };
+
+            // Añadir la petición a la lista
+            requests.push(newRequest);
+
+            // Actualizar la interfaz
+            renderRequests();
+
+            // Limpiar el formulario
+            document.getElementById('shiftForm').reset();
+        });
+
+        // Renderizar las peticiones en la interfaz
+        function renderRequests() {
+            const requestContainer = document.getElementById('requestContainer');
+            requestContainer.innerHTML = ''; // Limpiar las peticiones anteriores
+
+            requests.forEach(request => {
+                const requestDiv = document.createElement('div');
+                requestDiv.className = 'request border-2 border-dashed border-gray-500 p-4 bg-white';
+
+                requestDiv.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Petición - ID: ${request.id}</div>
+                    <div class="mt-2">
+                        <p><strong>Barco:</strong> ${request.shipName}</p>
+                        <p><strong>Fecha:</strong> ${request.date}</p>
+                        <p><strong>Jornada:</strong> ${request.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul class="list-disc pl-6">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <button onclick="downloadPDF(${request.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mt-4">
+                        Descargar Petición en PDF
+                    </button>
+                `;
+
+                requestContainer.appendChild(requestDiv);
+            });
+        }
+
+        // Descargar una petición en PDF
+        function downloadPDF(requestId) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar la petición por ID
+            const request = requests.find(r => r.id === requestId);
+
+            if (request) {
+                pdf.setFontSize(16);
+                pdf.text(`Petición - ID: ${request.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${request.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${request.date}`, 10, 30);
+                pdf.text(`Jornada: ${request.time}`, 10, 40);
+
+                pdf.text("Trabajadores:", 10, 50);
+                request.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 60 + i * 10);
+                });
+
+                pdf.save(`peticion_${request.id}.pdf`);
+            }
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Turnos y Peticiones</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos y Generación de Peticiones</h1>
+
+    <!-- Formulario para añadir turnos -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Añadir Turno</h2>
+        <form id="shiftForm" class="bg-white p-4 rounded shadow">
+            <div class="mb-4">
+                <label for="shipName" class="block text-gray-700 font-bold">Nombre del Barco:</label>
+                <input type="text" id="shipName" class="w-full border border-gray-300 p-2 rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="date" class="block text-gray-700 font-bold">Fecha:</label>
+                <input type="date" id="date" class="w-full border border-gray-300 p-2 rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="time" class="block text-gray-700 font-bold">Jornada:</label>
+                <select id="time" class="w-full border border-gray-300 p-2 rounded" required>
+                    <option value="02-08">02:00 - 08:00</option>
+                    <option value="08-14">08:00 - 14:00</option>
+                    <option value="14-20">14:00 - 20:00</option>
+                    <option value="20-02">20:00 - 02:00</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="workers" class="block text-gray-700 font-bold">Trabajadores (Nombre - Especialidad):</label>
+                <textarea id="workers" class="w-full border border-gray-300 p-2 rounded" placeholder="Ejemplo: Juan Pérez - Capataz, María López - Controlador" required></textarea>
+            </div>
+            <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">Añadir Turno</button>
+        </form>
+    </div>
+
+    <!-- Lista de peticiones generadas -->
+    <div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Peticiones Generadas</h2>
+        <div id="requestContainer" class="space-y-4">
+            <!-- Las peticiones se generarán aquí -->
+        </div>
+    </div>
+
+    <script>
+        let requests = []; // Lista de peticiones generadas
+
+        // Manejar el formulario de turnos
+        document.getElementById('shiftForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Obtener los datos del formulario
+            const shipName = document.getElementById('shipName').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const workersInput = document.getElementById('workers').value;
+
+            // Procesar los trabajadores
+            const workers = workersInput.split(',').map(worker => {
+                const [name, specialty] = worker.split('-').map(item => item.trim());
+                return { name, specialty };
+            });
+
+            // Crear una nueva petición
+            const newRequest = {
+                id: requests.length + 1, // Generar un ID único
+                shipName,
+                date,
+                time,
+                workers
+            };
+
+            // Añadir la petición a la lista
+            requests.push(newRequest);
+
+            // Actualizar la interfaz
+            renderRequests();
+
+            // Limpiar el formulario
+            document.getElementById('shiftForm').reset();
+        });
+
+        // Renderizar las peticiones en la interfaz
+        function renderRequests() {
+            const requestContainer = document.getElementById('requestContainer');
+            requestContainer.innerHTML = ''; // Limpiar las peticiones anteriores
+
+            requests.forEach(request => {
+                const requestDiv = document.createElement('div');
+                requestDiv.className = 'request border-2 border-dashed border-gray-500 p-4 bg-white';
+
+                requestDiv.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Petición - ID: ${request.id}</div>
+                    <div class="mt-2">
+                        <p><strong>Barco:</strong> ${request.shipName}</p>
+                        <p><strong>Fecha:</strong> ${request.date}</p>
+                        <p><strong>Jornada:</strong> ${request.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul class="list-disc pl-6">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <button onclick="downloadPDF(${request.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mt-4">
+                        Descargar Petición en PDF
+                    </button>
+                `;
+
+                requestContainer.appendChild(requestDiv);
+            });
+        }
+
+        // Descargar una petición en PDF
+        function downloadPDF(requestId) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar la petición por ID
+            const request = requests.find(r => r.id === requestId);
+
+            if (request) {
+                pdf.setFontSize(16);
+                pdf.text(`Petición - ID: ${request.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${request.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${request.date}`, 10, 30);
+                pdf.text(`Jornada: ${request.time}`, 10, 40);
+
+                pdf.text("Trabajadores:", 10, 50);
+                request.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 60 + i * 10);
+                });
+
+                pdf.save(`peticion_${request.id}.pdf`);
+            }
+        }
+    </script>
+</body>
+</html>
+```
