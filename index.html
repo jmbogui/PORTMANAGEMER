@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortManager</title>
+    <title>PortManager - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .hidden { display: none !important; }
@@ -12,77 +12,127 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <!-- Página de Login -->
-    <div id="loginPage" class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-blue-900">PortManager</h2>
-                <p class="text-gray-600">Sistema de Gestión Portuaria</p>
+    <!-- Dashboard del Administrador -->
+    <div id="adminDashboard" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Dashboard del Administrador</h1>
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Gestión de Trabajadores -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-2">Gestión de Trabajadores</h2>
+                <p class="text-gray-600 mb-4">Ver, editar y gestionar fichas de trabajadores.</p>
+                <button onclick="manageWorkers()" class="bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Ir a Gestión de Trabajadores
+                </button>
             </div>
-            <div class="space-y-4">
-                <input type="text" id="username" placeholder="Usuario"
-                       class="w-full p-2 border rounded">
-                <input type="password" id="password" placeholder="Contraseña"
-                       class="w-full p-2 border rounded">
-                <select id="role" class="w-full p-2 border rounded">
-                    <option value="admin">Administrador</option>
-                    <option value="empresa">Empresa Estibadora</option>
-                    <option value="estibador">Estibador</option>
-                </select>
-                <button onclick="login()"
-                        class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
-                    Iniciar Sesión
+            <!-- Gestión de Turnos -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-2">Gestión de Turnos</h2>
+                <p class="text-gray-600 mb-4">Asignar, sustituir y gestionar turnos.</p>
+                <button onclick="manageShifts()" class="bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Ir a Gestión de Turnos
+                </button>
+            </div>
+            <!-- Solicitudes de Empresas -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-2">Solicitudes de Empresas</h2>
+                <p class="text-gray-600 mb-4">Revisar y gestionar solicitudes de empresas estibadoras.</p>
+                <button onclick="manageRequests()" class="bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Ir a Solicitudes
                 </button>
             </div>
         </div>
-    </div>
-
-    <!-- Dashboard del Administrador -->
-    <div id="adminDashboard" class="hidden">
-        <h1 class="text-2xl font-bold text-center mt-8">Dashboard del Administrador</h1>
-        <button onclick="logout()" class="mt-4 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
-    </div>
-
-    <!-- Dashboard de Empresas Estibadoras -->
-    <div id="empresaDashboard" class="hidden">
-        <h1 class="text-2xl font-bold text-center mt-8">Dashboard de Empresas Estibadoras</h1>
-        <button onclick="logout()" class="mt-4 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
-    </div>
-
-    <!-- Dashboard de Estibadores -->
-    <div id="estibadorDashboard" class="hidden">
-        <h1 class="text-2xl font-bold text-center mt-8">Dashboard de Estibadores</h1>
-        <button onclick="logout()" class="mt-4 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
+        <button onclick="logout()" class="mt-8 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
     </div>
 
     <script>
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
+        function manageWorkers() {
+            alert("Redirigiendo a la Gestión de Trabajadores...");
+            // Aquí se implementará la funcionalidad de gestión de trabajadores
+        }
 
-            if (username && password) {
-                document.getElementById('loginPage').classList.add('hidden');
+        function manageShifts() {
+            alert("Redirigiendo a la Gestión de Turnos...");
+            // Aquí se implementará la funcionalidad de gestión de turnos
+        }
 
-                if (role === 'admin') {
-                    document.getElementById('adminDashboard').classList.remove('hidden');
-                } else if (role === 'empresa') {
-                    document.getElementById('empresaDashboard').classList.remove('hidden');
-                } else if (role === 'estibador') {
-                    document.getElementById('estibadorDashboard').classList.remove('hidden');
-                }
-            } else {
-                alert('Por favor, introduce usuario, contraseña y selecciona un rol');
-            }
+        function manageRequests() {
+            alert("Redirigiendo a la Gestión de Solicitudes...");
+            // Aquí se implementará la funcionalidad de gestión de solicitudes
         }
 
         function logout() {
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('empresaDashboard').classList.add('hidden');
-            document.getElementById('estibadorDashboard').classList.add('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            alert("Cerrando sesión...");
+            // Aquí se implementará la funcionalidad de cierre de sesión
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Dashboard del Administrador -->
+    <div id="adminDashboard" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Dashboard del Administrador</h1>
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Gestión de Trabajadores -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-2">Gestión de Trabajadores</h2>
+                <p class="text-gray-600 mb-4">Ver, editar y gestionar fichas de trabajadores.</p>
+                <button onclick="manageWorkers()" class="bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Ir a Gestión de Trabajadores
+                </button>
+            </div>
+            <!-- Gestión de Turnos -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-2">Gestión de Turnos</h2>
+                <p class="text-gray-600 mb-4">Asignar, sustituir y gestionar turnos.</p>
+                <button onclick="manageShifts()" class="bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Ir a Gestión de Turnos
+                </button>
+            </div>
+            <!-- Solicitudes de Empresas -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-2">Solicitudes de Empresas</h2>
+                <p class="text-gray-600 mb-4">Revisar y gestionar solicitudes de empresas estibadoras.</p>
+                <button onclick="manageRequests()" class="bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Ir a Solicitudes
+                </button>
+            </div>
+        </div>
+        <button onclick="logout()" class="mt-8 bg-red-500 text-white p-2 rounded">Cerrar Sesión</button>
+    </div>
+
+    <script>
+        function manageWorkers() {
+            alert("Redirigiendo a la Gestión de Trabajadores...");
+            // Aquí se implementará la funcionalidad de gestión de trabajadores
+        }
+
+        function manageShifts() {
+            alert("Redirigiendo a la Gestión de Turnos...");
+            // Aquí se implementará la funcionalidad de gestión de turnos
+        }
+
+        function manageRequests() {
+            alert("Redirigiendo a la Gestión de Solicitudes...");
+            // Aquí se implementará la funcionalidad de gestión de solicitudes
+        }
+
+        function logout() {
+            alert("Cerrando sesión...");
+            // Aquí se implementará la funcionalidad de cierre de sesión
         }
     </script>
 </body>
