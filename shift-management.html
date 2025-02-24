@@ -1,0 +1,312 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Turnos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Gestión de Turnos -->
+    <div id="shiftManagement" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos</h1>
+        <div class="mb-4">
+            <button onclick="addShift()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                Añadir Turno
+            </button>
+        </div>
+        <table class="table-auto w-full bg-white shadow rounded-lg">
+            <thead>
+                <tr class="bg-blue-900 text-white">
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Hora</th>
+                    <th class="p-2">Trabajador</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="shiftTable">
+                <!-- Turnos se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Añadir/Editar Turno -->
+    <div id="shiftModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Turno</h2>
+            <div class="space-y-4">
+                <input type="date" id="shiftDate" class="w-full p-2 border rounded">
+                <input type="time" id="shiftTime" class="w-full p-2 border rounded">
+                <select id="shiftWorker" class="w-full p-2 border rounded">
+                    <!-- Trabajadores disponibles se cargarán aquí -->
+                </select>
+                <button onclick="saveShift()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Guardar
+                </button>
+                <button onclick="closeModal()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let shifts = [];
+        let workers = [
+            { id: 1, name: "Juan Pérez" },
+            { id: 2, name: "María López" },
+            { id: 3, name: "Carlos García" }
+        ];
+        let editingShiftIndex = null;
+
+        function addShift() {
+            editingShiftIndex = null;
+            document.getElementById('modalTitle').textContent = 'Añadir Turno';
+            document.getElementById('shiftDate').value = '';
+            document.getElementById('shiftTime').value = '';
+            loadWorkers();
+            document.getElementById('shiftModal').classList.remove('hidden');
+        }
+
+        function editShift(index) {
+            editingShiftIndex = index;
+            document.getElementById('modalTitle').textContent = 'Editar Turno';
+            document.getElementById('shiftDate').value = shifts[index].date;
+            document.getElementById('shiftTime').value = shifts[index].time;
+            loadWorkers(shifts[index].workerId);
+            document.getElementById('shiftModal').classList.remove('hidden');
+        }
+
+        function deleteShift(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+                shifts.splice(index, 1);
+                renderShifts();
+            }
+        }
+
+        function saveShift() {
+            const date = document.getElementById('shiftDate').value;
+            const time = document.getElementById('shiftTime').value;
+            const workerId = document.getElementById('shiftWorker').value;
+
+            if (!date || !time || !workerId) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const worker = workers.find(w => w.id == workerId);
+
+            if (editingShiftIndex !== null) {
+                shifts[editingShiftIndex] = { date, time, workerId, workerName: worker.name };
+            } else {
+                shifts.push({ date, time, workerId, workerName: worker.name });
+            }
+
+            closeModal();
+            renderShifts();
+        }
+
+        function closeModal() {
+            document.getElementById('shiftModal').classList.add('hidden');
+        }
+
+        function renderShifts() {
+            const shiftTable = document.getElementById('shiftTable');
+            shiftTable.innerHTML = '';
+
+            shifts.forEach((shift, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2 text-center">${index + 1}</td>
+                    <td class="p-2 text-center">${shift.date}</td>
+                    <td class="p-2 text-center">${shift.time}</td>
+                    <td class="p-2 text-center">${shift.workerName}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="editShift(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
+                        <button onclick="deleteShift(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
+                    </td>
+                `;
+                shiftTable.appendChild(row);
+            });
+        }
+
+        function loadWorkers(selectedWorkerId = null) {
+            const shiftWorker = document.getElementById('shiftWorker');
+            shiftWorker.innerHTML = '';
+
+            workers.forEach(worker => {
+                const option = document.createElement('option');
+                option.value = worker.id;
+                option.textContent = worker.name;
+                if (worker.id == selectedWorkerId) {
+                    option.selected = true;
+                }
+                shiftWorker.appendChild(option);
+            });
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Turnos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Gestión de Turnos -->
+    <div id="shiftManagement" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos</h1>
+        <div class="mb-4">
+            <button onclick="addShift()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                Añadir Turno
+            </button>
+        </div>
+        <table class="table-auto w-full bg-white shadow rounded-lg">
+            <thead>
+                <tr class="bg-blue-900 text-white">
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Hora</th>
+                    <th class="p-2">Trabajador</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="shiftTable">
+                <!-- Turnos se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Añadir/Editar Turno -->
+    <div id="shiftModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Turno</h2>
+            <div class="space-y-4">
+                <input type="date" id="shiftDate" class="w-full p-2 border rounded">
+                <input type="time" id="shiftTime" class="w-full p-2 border rounded">
+                <select id="shiftWorker" class="w-full p-2 border rounded">
+                    <!-- Trabajadores disponibles se cargarán aquí -->
+                </select>
+                <button onclick="saveShift()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Guardar
+                </button>
+                <button onclick="closeModal()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let shifts = [];
+        let workers = [
+            { id: 1, name: "Juan Pérez" },
+            { id: 2, name: "María López" },
+            { id: 3, name: "Carlos García" }
+        ];
+        let editingShiftIndex = null;
+
+        function addShift() {
+            editingShiftIndex = null;
+            document.getElementById('modalTitle').textContent = 'Añadir Turno';
+            document.getElementById('shiftDate').value = '';
+            document.getElementById('shiftTime').value = '';
+            loadWorkers();
+            document.getElementById('shiftModal').classList.remove('hidden');
+        }
+
+        function editShift(index) {
+            editingShiftIndex = index;
+            document.getElementById('modalTitle').textContent = 'Editar Turno';
+            document.getElementById('shiftDate').value = shifts[index].date;
+            document.getElementById('shiftTime').value = shifts[index].time;
+            loadWorkers(shifts[index].workerId);
+            document.getElementById('shiftModal').classList.remove('hidden');
+        }
+
+        function deleteShift(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+                shifts.splice(index, 1);
+                renderShifts();
+            }
+        }
+
+        function saveShift() {
+            const date = document.getElementById('shiftDate').value;
+            const time = document.getElementById('shiftTime').value;
+            const workerId = document.getElementById('shiftWorker').value;
+
+            if (!date || !time || !workerId) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const worker = workers.find(w => w.id == workerId);
+
+            if (editingShiftIndex !== null) {
+                shifts[editingShiftIndex] = { date, time, workerId, workerName: worker.name };
+            } else {
+                shifts.push({ date, time, workerId, workerName: worker.name });
+            }
+
+            closeModal();
+            renderShifts();
+        }
+
+        function closeModal() {
+            document.getElementById('shiftModal').classList.add('hidden');
+        }
+
+        function renderShifts() {
+            const shiftTable = document.getElementById('shiftTable');
+            shiftTable.innerHTML = '';
+
+            shifts.forEach((shift, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2 text-center">${index + 1}</td>
+                    <td class="p-2 text-center">${shift.date}</td>
+                    <td class="p-2 text-center">${shift.time}</td>
+                    <td class="p-2 text-center">${shift.workerName}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="editShift(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
+                        <button onclick="deleteShift(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
+                    </td>
+                `;
+                shiftTable.appendChild(row);
+            });
+        }
+
+        function loadWorkers(selectedWorkerId = null) {
+            const shiftWorker = document.getElementById('shiftWorker');
+            shiftWorker.innerHTML = '';
+
+            workers.forEach(worker => {
+                const option = document.createElement('option');
+                option.value = worker.id;
+                option.textContent = worker.name;
+                if (worker.id == selectedWorkerId) {
+                    option.selected = true;
+                }
+                shiftWorker.appendChild(option);
+            });
+        }
+    </script>
+</body>
+</html>
+```
