@@ -1,0 +1,448 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Historial de Peticiones</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos y Historial de Peticiones</h1>
+
+    <!-- Tabla de turnos -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Turnos Asignados</h2>
+        <table class="table-auto w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Barco</th>
+                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2">Jornada</th>
+                    <th class="px-4 py-2">Trabajadores</th>
+                </tr>
+            </thead>
+            <tbody id="shiftTable">
+                <!-- Los turnos se generarán aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Lista de peticiones generadas -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Peticiones Generadas</h2>
+        <div id="requestContainer" class="space-y-4">
+            <!-- Las peticiones se generarán automáticamente aquí -->
+        </div>
+    </div>
+
+    <!-- Historial de peticiones -->
+    <div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Historial de Peticiones</h2>
+        <table class="table-auto w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Barco</th>
+                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2">Jornada</th>
+                    <th class="px-4 py-2">Trabajadores</th>
+                    <th class="px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                <!-- El historial de peticiones se generará aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let shifts = [
+            {
+                id: 1,
+                shipName: "Barco A",
+                date: "2025-02-25",
+                time: "08-14",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" }
+                ]
+            },
+            {
+                id: 2,
+                shipName: "Barco B",
+                date: "2025-02-25",
+                time: "14-20",
+                workers: [
+                    { name: "Carlos García", specialty: "Gruista" },
+                    { name: "Ana Torres", specialty: "Amantero" }
+                ]
+            }
+        ];
+
+        let requests = []; // Lista de peticiones generadas automáticamente
+        let history = []; // Historial de peticiones
+
+        // Generar automáticamente peticiones al cargar los turnos
+        function generateRequestsAutomatically() {
+            shifts.forEach(shift => {
+                const newRequest = {
+                    id: requests.length + 1, // Generar un ID único
+                    shipName: shift.shipName,
+                    date: shift.date,
+                    time: shift.time,
+                    workers: shift.workers
+                };
+
+                // Añadir la petición a la lista
+                requests.push(newRequest);
+
+                // Añadir al historial
+                history.push(newRequest);
+            });
+
+            // Renderizar las peticiones y el historial en la interfaz
+            renderRequests();
+            renderHistory();
+        }
+
+        // Renderizar turnos en la tabla
+        function renderShifts() {
+            const shiftTable = document.getElementById('shiftTable');
+            shiftTable.innerHTML = ''; // Limpiar la tabla
+
+            shifts.forEach(shift => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">${shift.id}</td>
+                    <td class="px-4 py-2">${shift.shipName}</td>
+                    <td class="px-4 py-2">${shift.date}</td>
+                    <td class="px-4 py-2">${shift.time}</td>
+                    <td class="px-4 py-2">
+                        <ul class="list-disc pl-4">
+                            ${shift.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </td>
+                `;
+
+                shiftTable.appendChild(row);
+            });
+        }
+
+        // Renderizar las peticiones en la interfaz
+        function renderRequests() {
+            const requestContainer = document.getElementById('requestContainer');
+            requestContainer.innerHTML = ''; // Limpiar las peticiones anteriores
+
+            requests.forEach(request => {
+                const requestDiv = document.createElement('div');
+                requestDiv.className = 'request border-2 border-dashed border-gray-500 p-4 bg-white';
+
+                requestDiv.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Petición - ID: ${request.id}</div>
+                    <div class="mt-2">
+                        <p><strong>Barco:</strong> ${request.shipName}</p>
+                        <p><strong>Fecha:</strong> ${request.date}</p>
+                        <p><strong>Jornada:</strong> ${request.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul class="list-disc pl-6">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                requestContainer.appendChild(requestDiv);
+            });
+        }
+
+        // Renderizar el historial de peticiones
+        function renderHistory() {
+            const historyTable = document.getElementById('historyTable');
+            historyTable.innerHTML = ''; // Limpiar el historial anterior
+
+            history.forEach(request => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">${request.id}</td>
+                    <td class="px-4 py-2">${request.shipName}</td>
+                    <td class="px-4 py-2">${request.date}</td>
+                    <td class="px-4 py-2">${request.time}</td>
+                    <td class="px-4 py-2">
+                        <ul class="list-disc pl-4">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </td>
+                    <td class="px-4 py-2">
+                        <button onclick="downloadPDF(${request.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                            Descargar PDF
+                        </button>
+                    </td>
+                `;
+
+                historyTable.appendChild(row);
+            });
+        }
+
+        // Descargar una petición en PDF
+        function downloadPDF(requestId) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar la petición por ID
+            const request = history.find(r => r.id === requestId);
+
+            if (request) {
+                pdf.setFontSize(16);
+                pdf.text(`Petición - ID: ${request.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${request.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${request.date}`, 10, 30);
+                pdf.text(`Jornada: ${request.time}`, 10, 40);
+
+                pdf.text("Trabajadores:", 10, 50);
+                request.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 60 + i * 10);
+                });
+
+                pdf.save(`peticion_${request.id}.pdf`);
+            }
+        }
+
+        // Inicializar la interfaz
+        renderShifts();
+        generateRequestsAutomatically(); // Generar peticiones automáticamente al cargar los turnos
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Historial de Peticiones</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos y Historial de Peticiones</h1>
+
+    <!-- Tabla de turnos -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Turnos Asignados</h2>
+        <table class="table-auto w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Barco</th>
+                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2">Jornada</th>
+                    <th class="px-4 py-2">Trabajadores</th>
+                </tr>
+            </thead>
+            <tbody id="shiftTable">
+                <!-- Los turnos se generarán aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Lista de peticiones generadas -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Peticiones Generadas</h2>
+        <div id="requestContainer" class="space-y-4">
+            <!-- Las peticiones se generarán automáticamente aquí -->
+        </div>
+    </div>
+
+    <!-- Historial de peticiones -->
+    <div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Historial de Peticiones</h2>
+        <table class="table-auto w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Barco</th>
+                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2">Jornada</th>
+                    <th class="px-4 py-2">Trabajadores</th>
+                    <th class="px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                <!-- El historial de peticiones se generará aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let shifts = [
+            {
+                id: 1,
+                shipName: "Barco A",
+                date: "2025-02-25",
+                time: "08-14",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" }
+                ]
+            },
+            {
+                id: 2,
+                shipName: "Barco B",
+                date: "2025-02-25",
+                time: "14-20",
+                workers: [
+                    { name: "Carlos García", specialty: "Gruista" },
+                    { name: "Ana Torres", specialty: "Amantero" }
+                ]
+            }
+        ];
+
+        let requests = []; // Lista de peticiones generadas automáticamente
+        let history = []; // Historial de peticiones
+
+        // Generar automáticamente peticiones al cargar los turnos
+        function generateRequestsAutomatically() {
+            shifts.forEach(shift => {
+                const newRequest = {
+                    id: requests.length + 1, // Generar un ID único
+                    shipName: shift.shipName,
+                    date: shift.date,
+                    time: shift.time,
+                    workers: shift.workers
+                };
+
+                // Añadir la petición a la lista
+                requests.push(newRequest);
+
+                // Añadir al historial
+                history.push(newRequest);
+            });
+
+            // Renderizar las peticiones y el historial en la interfaz
+            renderRequests();
+            renderHistory();
+        }
+
+        // Renderizar turnos en la tabla
+        function renderShifts() {
+            const shiftTable = document.getElementById('shiftTable');
+            shiftTable.innerHTML = ''; // Limpiar la tabla
+
+            shifts.forEach(shift => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">${shift.id}</td>
+                    <td class="px-4 py-2">${shift.shipName}</td>
+                    <td class="px-4 py-2">${shift.date}</td>
+                    <td class="px-4 py-2">${shift.time}</td>
+                    <td class="px-4 py-2">
+                        <ul class="list-disc pl-4">
+                            ${shift.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </td>
+                `;
+
+                shiftTable.appendChild(row);
+            });
+        }
+
+        // Renderizar las peticiones en la interfaz
+        function renderRequests() {
+            const requestContainer = document.getElementById('requestContainer');
+            requestContainer.innerHTML = ''; // Limpiar las peticiones anteriores
+
+            requests.forEach(request => {
+                const requestDiv = document.createElement('div');
+                requestDiv.className = 'request border-2 border-dashed border-gray-500 p-4 bg-white';
+
+                requestDiv.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Petición - ID: ${request.id}</div>
+                    <div class="mt-2">
+                        <p><strong>Barco:</strong> ${request.shipName}</p>
+                        <p><strong>Fecha:</strong> ${request.date}</p>
+                        <p><strong>Jornada:</strong> ${request.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul class="list-disc pl-6">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                requestContainer.appendChild(requestDiv);
+            });
+        }
+
+        // Renderizar el historial de peticiones
+        function renderHistory() {
+            const historyTable = document.getElementById('historyTable');
+            historyTable.innerHTML = ''; // Limpiar el historial anterior
+
+            history.forEach(request => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">${request.id}</td>
+                    <td class="px-4 py-2">${request.shipName}</td>
+                    <td class="px-4 py-2">${request.date}</td>
+                    <td class="px-4 py-2">${request.time}</td>
+                    <td class="px-4 py-2">
+                        <ul class="list-disc pl-4">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </td>
+                    <td class="px-4 py-2">
+                        <button onclick="downloadPDF(${request.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                            Descargar PDF
+                        </button>
+                    </td>
+                `;
+
+                historyTable.appendChild(row);
+            });
+        }
+
+        // Descargar una petición en PDF
+        function downloadPDF(requestId) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar la petición por ID
+            const request = history.find(r => r.id === requestId);
+
+            if (request) {
+                pdf.setFontSize(16);
+                pdf.text(`Petición - ID: ${request.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${request.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${request.date}`, 10, 30);
+                pdf.text(`Jornada: ${request.time}`, 10, 40);
+
+                pdf.text("Trabajadores:", 10, 50);
+                request.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 60 + i * 10);
+                });
+
+                pdf.save(`peticion_${request.id}.pdf`);
+            }
+        }
+
+        // Inicializar la interfaz
+        renderShifts();
+        generateRequestsAutomatically(); // Generar peticiones automáticamente al cargar los turnos
+    </script>
+</body>
+</html>
+```
