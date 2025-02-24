@@ -1,0 +1,412 @@
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Historial de Peticiones con Filtros</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Historial de Peticiones con Filtros</h1>
+
+    <!-- Filtros -->
+    <div class="mb-8 bg-white p-4 rounded shadow">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Filtros</h2>
+        <form id="filterForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label for="filterDate" class="block text-gray-700 font-bold">Fecha:</label>
+                <input type="date" id="filterDate" class="w-full border border-gray-300 p-2 rounded">
+            </div>
+            <div>
+                <label for="filterShip" class="block text-gray-700 font-bold">Barco:</label>
+                <input type="text" id="filterShip" class="w-full border border-gray-300 p-2 rounded" placeholder="Nombre del barco">
+            </div>
+            <div>
+                <label for="filterWorker" class="block text-gray-700 font-bold">Trabajador:</label>
+                <input type="text" id="filterWorker" class="w-full border border-gray-300 p-2 rounded" placeholder="Nombre del trabajador">
+            </div>
+            <div>
+                <label for="filterCompany" class="block text-gray-700 font-bold">Empresa:</label>
+                <input type="text" id="filterCompany" class="w-full border border-gray-300 p-2 rounded" placeholder="Nombre de la empresa">
+            </div>
+        </form>
+        <button onclick="applyFilters()" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Aplicar Filtros</button>
+        <button onclick="resetFilters()" class="mt-4 bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Restablecer Filtros</button>
+    </div>
+
+    <!-- Historial de peticiones -->
+    <div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Historial de Peticiones</h2>
+        <table class="table-auto w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Barco</th>
+                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2">Jornada</th>
+                    <th class="px-4 py-2">Trabajadores</th>
+                    <th class="px-4 py-2">Empresa</th>
+                    <th class="px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                <!-- El historial de peticiones se generará aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let history = [
+            {
+                id: 1,
+                shipName: "Barco A",
+                date: "2025-02-25",
+                time: "08-14",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" }
+                ],
+                company: "Empresa 1"
+            },
+            {
+                id: 2,
+                shipName: "Barco B",
+                date: "2025-02-26",
+                time: "14-20",
+                workers: [
+                    { name: "Carlos García", specialty: "Gruista" },
+                    { name: "Ana Torres", specialty: "Amantero" }
+                ],
+                company: "Empresa 2"
+            },
+            {
+                id: 3,
+                shipName: "Barco C",
+                date: "2025-02-27",
+                time: "20-02",
+                workers: [
+                    { name: "Luis Fernández", specialty: "Estibador" },
+                    { name: "Sofía Martínez", specialty: "Controlador" }
+                ],
+                company: "Empresa 1"
+            }
+        ];
+
+        let filteredHistory = [...history]; // Copia inicial del historial para aplicar filtros
+
+        // Renderizar el historial de peticiones
+        function renderHistory(data) {
+            const historyTable = document.getElementById('historyTable');
+            historyTable.innerHTML = ''; // Limpiar el historial anterior
+
+            data.forEach(request => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">${request.id}</td>
+                    <td class="px-4 py-2">${request.shipName}</td>
+                    <td class="px-4 py-2">${request.date}</td>
+                    <td class="px-4 py-2">${request.time}</td>
+                    <td class="px-4 py-2">
+                        <ul class="list-disc pl-4">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </td>
+                    <td class="px-4 py-2">${request.company}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="downloadPDF(${request.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                            Descargar PDF
+                        </button>
+                    </td>
+                `;
+
+                historyTable.appendChild(row);
+            });
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            const filterDate = document.getElementById('filterDate').value;
+            const filterShip = document.getElementById('filterShip').value.toLowerCase();
+            const filterWorker = document.getElementById('filterWorker').value.toLowerCase();
+            const filterCompany = document.getElementById('filterCompany').value.toLowerCase();
+
+            filteredHistory = history.filter(request => {
+                const matchesDate = filterDate ? request.date === filterDate : true;
+                const matchesShip = filterShip ? request.shipName.toLowerCase().includes(filterShip) : true;
+                const matchesWorker = filterWorker
+                    ? request.workers.some(worker => worker.name.toLowerCase().includes(filterWorker))
+                    : true;
+                const matchesCompany = filterCompany ? request.company.toLowerCase().includes(filterCompany) : true;
+
+                return matchesDate && matchesShip && matchesWorker && matchesCompany;
+            });
+
+            renderHistory(filteredHistory);
+        }
+
+        // Restablecer filtros
+        function resetFilters() {
+            document.getElementById('filterForm').reset();
+            filteredHistory = [...history];
+            renderHistory(filteredHistory);
+        }
+
+        // Descargar una petición en PDF
+        function downloadPDF(requestId) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar la petición por ID
+            const request = history.find(r => r.id === requestId);
+
+            if (request) {
+                pdf.setFontSize(16);
+                pdf.text(`Petición - ID: ${request.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${request.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${request.date}`, 10, 30);
+                pdf.text(`Jornada: ${request.time}`, 10, 40);
+                pdf.text(`Empresa: ${request.company}`, 10, 50);
+
+                pdf.text("Trabajadores:", 10, 60);
+                request.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 70 + i * 10);
+                });
+
+                pdf.save(`peticion_${request.id}.pdf`);
+            }
+        }
+
+        // Inicializar la interfaz
+        renderHistory(filteredHistory);
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Historial de Peticiones con Filtros</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Historial de Peticiones con Filtros</h1>
+
+    <!-- Filtros -->
+    <div class="mb-8 bg-white p-4 rounded shadow">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Filtros</h2>
+        <form id="filterForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label for="filterDate" class="block text-gray-700 font-bold">Fecha:</label>
+                <input type="date" id="filterDate" class="w-full border border-gray-300 p-2 rounded">
+            </div>
+            <div>
+                <label for="filterShip" class="block text-gray-700 font-bold">Barco:</label>
+                <input type="text" id="filterShip" class="w-full border border-gray-300 p-2 rounded" placeholder="Nombre del barco">
+            </div>
+            <div>
+                <label for="filterWorker" class="block text-gray-700 font-bold">Trabajador:</label>
+                <input type="text" id="filterWorker" class="w-full border border-gray-300 p-2 rounded" placeholder="Nombre del trabajador">
+            </div>
+            <div>
+                <label for="filterCompany" class="block text-gray-700 font-bold">Empresa:</label>
+                <input type="text" id="filterCompany" class="w-full border border-gray-300 p-2 rounded" placeholder="Nombre de la empresa">
+            </div>
+        </form>
+        <button onclick="applyFilters()" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Aplicar Filtros</button>
+        <button onclick="resetFilters()" class="mt-4 bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Restablecer Filtros</button>
+    </div>
+
+    <!-- Historial de peticiones -->
+    <div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Historial de Peticiones</h2>
+        <table class="table-auto w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Barco</th>
+                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2">Jornada</th>
+                    <th class="px-4 py-2">Trabajadores</th>
+                    <th class="px-4 py-2">Empresa</th>
+                    <th class="px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                <!-- El historial de peticiones se generará aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let history = [
+            {
+                id: 1,
+                shipName: "Barco A",
+                date: "2025-02-25",
+                time: "08-14",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" }
+                ],
+                company: "Empresa 1"
+            },
+            {
+                id: 2,
+                shipName: "Barco B",
+                date: "2025-02-26",
+                time: "14-20",
+                workers: [
+                    { name: "Carlos García", specialty: "Gruista" },
+                    { name: "Ana Torres", specialty: "Amantero" }
+                ],
+                company: "Empresa 2"
+            },
+            {
+                id: 3,
+                shipName: "Barco C",
+                date: "2025-02-27",
+                time: "20-02",
+                workers: [
+                    { name: "Luis Fernández", specialty: "Estibador" },
+                    { name: "Sofía Martínez", specialty: "Controlador" }
+                ],
+                company: "Empresa 1"
+            }
+        ];
+
+        let filteredHistory = [...history]; // Copia inicial del historial para aplicar filtros
+
+        // Renderizar el historial de peticiones
+        function renderHistory(data) {
+            const historyTable = document.getElementById('historyTable');
+            historyTable.innerHTML = ''; // Limpiar el historial anterior
+
+            data.forEach(request => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">${request.id}</td>
+                    <td class="px-4 py-2">${request.shipName}</td>
+                    <td class="px-4 py-2">${request.date}</td>
+                    <td class="px-4 py-2">${request.time}</td>
+                    <td class="px-4 py-2">
+                        <ul class="list-disc pl-4">
+                            ${request.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </td>
+                    <td class="px-4 py-2">${request.company}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="downloadPDF(${request.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                            Descargar PDF
+                        </button>
+                    </td>
+                `;
+
+                historyTable.appendChild(row);
+            });
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            const filterDate = document.getElementById('filterDate').value;
+            const filterShip = document.getElementById('filterShip').value.toLowerCase();
+            const filterWorker = document.getElementById('filterWorker').value.toLowerCase();
+            const filterCompany = document.getElementById('filterCompany').value.toLowerCase();
+
+            filteredHistory = history.filter(request => {
+                const matchesDate = filterDate ? request.date === filterDate : true;
+                const matchesShip = filterShip ? request.shipName.toLowerCase().includes(filterShip) : true;
+                const matchesWorker = filterWorker
+                    ? request.workers.some(worker => worker.name.toLowerCase().includes(filterWorker))
+                    : true;
+                const matchesCompany = filterCompany ? request.company.toLowerCase().includes(filterCompany) : true;
+
+                return matchesDate && matchesShip && matchesWorker && matchesCompany;
+            });
+
+            renderHistory(filteredHistory);
+        }
+
+        // Restablecer filtros
+        function resetFilters() {
+            document.getElementById('filterForm').reset();
+            filteredHistory = [...history];
+            renderHistory(filteredHistory);
+        }
+
+        // Descargar una petición en PDF
+        function downloadPDF(requestId) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar la petición por ID
+            const request = history.find(r => r.id === requestId);
+
+            if (request) {
+                pdf.setFontSize(16);
+                pdf.text(`Petición - ID: ${request.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${request.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${request.date}`, 10, 30);
+                pdf.text(`Jornada: ${request.time}`, 10, 40);
+                pdf.text(`Empresa: ${request.company}`, 10, 50);
+
+                pdf.text("Trabajadores:", 10, 60);
+                request.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 70 + i * 10);
+                });
+
+                pdf.save(`peticion_${request.id}.pdf`);
+            }
+        }
+
+        // Inicializar la interfaz
+        renderHistory(filteredHistory);
+    </script>
+</body>
+</html>
+```
+
+---
+
+### **Qué hace este código:**
+1. **Filtros dinámicos:**
+   - Permite filtrar el historial de peticiones por:
+     - Fecha.
+     - Nombre del barco.
+     - Nombre del trabajador.
+     - Nombre de la empresa.
+   - Los filtros se aplican en tiempo real al presionar el botón "Aplicar Filtros".
+
+2. **Restablecer filtros:**
+   - Un botón permite restablecer los filtros y mostrar todo el historial.
+
+3. **Historial de peticiones:**
+   - Muestra una tabla con todas las peticiones generadas, incluyendo barco, fecha, jornada, trabajadores y empresa.
+
+4. **Descarga en PDF:**
+   - Cada entrada en el historial tiene un botón para descargar la petición en formato PDF.
+
+---
+
+### **Cómo probarlo:**
+1. **Crea un archivo llamado `petition-filters.html`.**
+2. **Copia y pega el código anterior en ese archivo.**
+3. **Abre el archivo en tu navegador.**
+4. **Prueba los filtros ingresando diferentes valores y verifica que el historial se actualice correctamente.**
+5. **Descarga las peticiones en PDF desde el historial.**
+
+¿Te gustaría añadir más funcionalidades, como exportar todo el historial en un solo archivo PDF o generar reportes? 😊
