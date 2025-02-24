@@ -1,0 +1,244 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Automatización</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Gestión de Turnos y Peticiones</h1>
+
+        <!-- Tabla de Turnos -->
+        <table class="table-auto w-full border-collapse border border-gray-400 mb-6">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-400 px-4 py-2">Barco</th>
+                    <th class="border border-gray-400 px-4 py-2">Fecha</th>
+                    <th class="border border-gray-400 px-4 py-2">Jornada</th>
+                    <th class="border border-gray-400 px-4 py-2">Trabajadores</th>
+                    <th class="border border-gray-400 px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="shiftTable">
+                <!-- Turnos generados dinámicamente -->
+            </tbody>
+        </table>
+
+        <!-- Lista de Peticiones Generadas -->
+        <h2 class="text-xl font-bold mb-4">Peticiones Generadas</h2>
+        <ul id="petitionList" class="list-disc pl-6">
+            <!-- Peticiones generadas dinámicamente -->
+        </ul>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const shifts = [
+            {
+                barco: "Barco A",
+                fecha: "2025-02-27",
+                jornada: "08:00 - 14:00",
+                trabajadores: ["Juan Pérez", "María López", "Carlos García"]
+            },
+            {
+                barco: "Barco B",
+                fecha: "2025-02-28",
+                jornada: "14:00 - 20:00",
+                trabajadores: ["Ana Torres", "Luis Martínez", "Sofía Gómez"]
+            }
+        ];
+
+        // Función para generar peticiones automáticamente
+        function generatePetitions() {
+            const petitionList = document.getElementById("petitionList");
+            petitionList.innerHTML = ""; // Limpiar lista
+
+            shifts.forEach((shift, index) => {
+                // Crear contenido de la petición
+                const petitionContent = `
+                    Barco: ${shift.barco}
+                    Fecha: ${shift.fecha}
+                    Jornada: ${shift.jornada}
+                    Trabajadores: ${shift.trabajadores.join(", ")}
+                `;
+
+                // Añadir a la lista de peticiones
+                const listItem = document.createElement("li");
+                listItem.textContent = `Petición ${index + 1}: ${shift.barco} - ${shift.fecha}`;
+                petitionList.appendChild(listItem);
+
+                // Generar PDF automáticamente
+                generatePDF(petitionContent, `Peticion_${index + 1}.pdf`);
+
+                // Enviar notificación por correo (simulado)
+                sendEmail(shift, `Peticion_${index + 1}.pdf`);
+            });
+        }
+
+        // Función para generar PDF
+        function generatePDF(content, fileName) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(content, 10, 10);
+            doc.save(fileName);
+        }
+
+        // Función para enviar correo (simulado)
+        function sendEmail(shift, fileName) {
+            console.log(`Enviando correo a trabajadores: ${shift.trabajadores.join(", ")}`);
+            console.log(`Archivo adjunto: ${fileName}`);
+            alert(`Correo enviado a trabajadores del turno: ${shift.barco}`);
+        }
+
+        // Renderizar turnos en la tabla
+        function renderShifts() {
+            const shiftTable = document.getElementById("shiftTable");
+            shiftTable.innerHTML = ""; // Limpiar tabla
+
+            shifts.forEach((shift, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border border-gray-400 px-4 py-2">${shift.barco}</td>
+                    <td class="border border-gray-400 px-4 py-2">${shift.fecha}</td>
+                    <td class="border border-gray-400 px-4 py-2">${shift.jornada}</td>
+                    <td class="border border-gray-400 px-4 py-2">${shift.trabajadores.join(", ")}</td>
+                    <td class="border border-gray-400 px-4 py-2">
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="generatePetitions()">Generar Peticiones</button>
+                    </td>
+                `;
+                shiftTable.appendChild(row);
+            });
+        }
+
+        // Inicializar
+        renderShifts();
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Automatización</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Gestión de Turnos y Peticiones</h1>
+
+        <!-- Tabla de Turnos -->
+        <table class="table-auto w-full border-collapse border border-gray-400 mb-6">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-400 px-4 py-2">Barco</th>
+                    <th class="border border-gray-400 px-4 py-2">Fecha</th>
+                    <th class="border border-gray-400 px-4 py-2">Jornada</th>
+                    <th class="border border-gray-400 px-4 py-2">Trabajadores</th>
+                    <th class="border border-gray-400 px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="shiftTable">
+                <!-- Turnos generados dinámicamente -->
+            </tbody>
+        </table>
+
+        <!-- Lista de Peticiones Generadas -->
+        <h2 class="text-xl font-bold mb-4">Peticiones Generadas</h2>
+        <ul id="petitionList" class="list-disc pl-6">
+            <!-- Peticiones generadas dinámicamente -->
+        </ul>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const shifts = [
+            {
+                barco: "Barco A",
+                fecha: "2025-02-27",
+                jornada: "08:00 - 14:00",
+                trabajadores: ["Juan Pérez", "María López", "Carlos García"]
+            },
+            {
+                barco: "Barco B",
+                fecha: "2025-02-28",
+                jornada: "14:00 - 20:00",
+                trabajadores: ["Ana Torres", "Luis Martínez", "Sofía Gómez"]
+            }
+        ];
+
+        // Función para generar peticiones automáticamente
+        function generatePetitions() {
+            const petitionList = document.getElementById("petitionList");
+            petitionList.innerHTML = ""; // Limpiar lista
+
+            shifts.forEach((shift, index) => {
+                // Crear contenido de la petición
+                const petitionContent = `
+                    Barco: ${shift.barco}
+                    Fecha: ${shift.fecha}
+                    Jornada: ${shift.jornada}
+                    Trabajadores: ${shift.trabajadores.join(", ")}
+                `;
+
+                // Añadir a la lista de peticiones
+                const listItem = document.createElement("li");
+                listItem.textContent = `Petición ${index + 1}: ${shift.barco} - ${shift.fecha}`;
+                petitionList.appendChild(listItem);
+
+                // Generar PDF automáticamente
+                generatePDF(petitionContent, `Peticion_${index + 1}.pdf`);
+
+                // Enviar notificación por correo (simulado)
+                sendEmail(shift, `Peticion_${index + 1}.pdf`);
+            });
+        }
+
+        // Función para generar PDF
+        function generatePDF(content, fileName) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(content, 10, 10);
+            doc.save(fileName);
+        }
+
+        // Función para enviar correo (simulado)
+        function sendEmail(shift, fileName) {
+            console.log(`Enviando correo a trabajadores: ${shift.trabajadores.join(", ")}`);
+            console.log(`Archivo adjunto: ${fileName}`);
+            alert(`Correo enviado a trabajadores del turno: ${shift.barco}`);
+        }
+
+        // Renderizar turnos en la tabla
+        function renderShifts() {
+            const shiftTable = document.getElementById("shiftTable");
+            shiftTable.innerHTML = ""; // Limpiar tabla
+
+            shifts.forEach((shift, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border border-gray-400 px-4 py-2">${shift.barco}</td>
+                    <td class="border border-gray-400 px-4 py-2">${shift.fecha}</td>
+                    <td class="border border-gray-400 px-4 py-2">${shift.jornada}</td>
+                    <td class="border border-gray-400 px-4 py-2">${shift.trabajadores.join(", ")}</td>
+                    <td class="border border-gray-400 px-4 py-2">
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="generatePetitions()">Generar Peticiones</button>
+                    </td>
+                `;
+                shiftTable.appendChild(row);
+            });
+        }
+
+        // Inicializar
+        renderShifts();
+    </script>
+</body>
+</html>
+```
