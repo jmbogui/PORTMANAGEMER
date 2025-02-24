@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortManager - Gestión de Turnos</title>
+    <title>PortManager - Gestión de Turnos Automática</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .hidden { display: none !important; }
@@ -14,7 +14,7 @@
 <body class="bg-gray-100">
     <!-- Gestión de Turnos -->
     <div id="shiftManagement" class="min-h-screen p-8">
-        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos</h1>
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos con Asignación Automática</h1>
         <div class="mb-4">
             <button onclick="addShift()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
                 Añadir Turno
@@ -38,7 +38,7 @@
         </table>
     </div>
 
-    <!-- Modal para Añadir/Editar Turno -->
+    <!-- Modal para Añadir Turno -->
     <div id="shiftModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Turno</h2>
@@ -55,9 +55,8 @@
                     <option value="Descarga">Descarga</option>
                     <option value="Mantenimiento">Mantenimiento</option>
                 </select>
-                <input type="text" id="shiftShip" placeholder="Nombre del Barco" class="w-full p-2 border rounded">
-                <select id="shiftWorker" class="w-full p-2 border rounded">
-                    <!-- Trabajadores disponibles se cargarán aquí -->
+                <select id="shiftShip" class="w-full p-2 border rounded">
+                    <!-- Barcos disponibles se cargarán aquí -->
                 </select>
                 <button onclick="saveShift()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
                     Guardar
@@ -72,9 +71,14 @@
     <script>
         let shifts = [];
         let workers = [
-            { id: 1, name: "Juan Pérez" },
-            { id: 2, name: "María López" },
-            { id: 3, name: "Carlos García" }
+            { id: 1, name: "Juan Pérez", specialty: "Carga", lastShift: null },
+            { id: 2, name: "María López", specialty: "Descarga", lastShift: null },
+            { id: 3, name: "Carlos García", specialty: "Mantenimiento", lastShift: null }
+        ];
+        let ships = [
+            { id: 1, name: "Barco A", priority: 1 },
+            { id: 2, name: "Barco B", priority: 2 },
+            { id: 3, name: "Barco C", priority: 3 }
         ];
         let editingShiftIndex = null;
 
@@ -84,51 +88,49 @@
             document.getElementById('shiftDate').value = '';
             document.getElementById('shiftTime').value = '02-08';
             document.getElementById('shiftSpecialty').value = 'Carga';
-            document.getElementById('shiftShip').value = '';
-            loadWorkers();
+            loadShips();
             document.getElementById('shiftModal').classList.remove('hidden');
-        }
-
-        function editShift(index) {
-            editingShiftIndex = index;
-            document.getElementById('modalTitle').textContent = 'Editar Turno';
-            document.getElementById('shiftDate').value = shifts[index].date;
-            document.getElementById('shiftTime').value = shifts[index].time;
-            document.getElementById('shiftSpecialty').value = shifts[index].specialty;
-            document.getElementById('shiftShip').value = shifts[index].ship;
-            loadWorkers(shifts[index].workerId);
-            document.getElementById('shiftModal').classList.remove('hidden');
-        }
-
-        function deleteShift(index) {
-            if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
-                shifts.splice(index, 1);
-                renderShifts();
-            }
         }
 
         function saveShift() {
             const date = document.getElementById('shiftDate').value;
             const time = document.getElementById('shiftTime').value;
             const specialty = document.getElementById('shiftSpecialty').value;
-            const ship = document.getElementById('shiftShip').value;
-            const workerId = document.getElementById('shiftWorker').value;
+            const shipId = document.getElementById('shiftShip').value;
 
-            if (!date || !time || !specialty || !ship || !workerId) {
+            if (!date || !time || !specialty || !shipId) {
                 alert('Por favor, completa todos los campos.');
                 return;
             }
 
-            const worker = workers.find(w => w.id == workerId);
+            const ship = ships.find(s => s.id == shipId);
+            const worker = assignWorker(specialty);
 
-            if (editingShiftIndex !== null) {
-                shifts[editingShiftIndex] = { date, time, specialty, ship, workerId, workerName: worker.name };
-            } else {
-                shifts.push({ date, time, specialty, ship, workerId, workerName: worker.name });
+            if (!worker) {
+                alert('No hay trabajadores disponibles para esta especialidad.');
+                return;
             }
 
+            const newShift = { date, time, specialty, shipName: ship.name, workerName: worker.name };
+
+            if (editingShiftIndex !== null) {
+                shifts[editingShiftIndex] = newShift;
+            } else {
+                shifts.push(newShift);
+            }
+
+            worker.lastShift = date; // Actualiza la última fecha de turno del trabajador
             closeModal();
             renderShifts();
+        }
+
+        function assignWorker(specialty) {
+            // Filtra trabajadores por especialidad y ordena por la última fecha de turno (rotación)
+            const availableWorkers = workers
+                .filter(worker => worker.specialty === specialty)
+                .sort((a, b) => (a.lastShift || '') > (b.lastShift || '') ? 1 : -1);
+
+            return availableWorkers.length > 0 ? availableWorkers[0] : null;
         }
 
         function closeModal() {
@@ -146,10 +148,9 @@
                     <td class="p-2 text-center">${shift.date}</td>
                     <td class="p-2 text-center">${shift.time}</td>
                     <td class="p-2 text-center">${shift.specialty}</td>
-                    <td class="p-2 text-center">${shift.ship}</td>
+                    <td class="p-2 text-center">${shift.shipName}</td>
                     <td class="p-2 text-center">${shift.workerName}</td>
                     <td class="p-2 text-center">
-                        <button onclick="editShift(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
                         <button onclick="deleteShift(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
                     </td>
                 `;
@@ -157,19 +158,25 @@
             });
         }
 
-        function loadWorkers(selectedWorkerId = null) {
-            const shiftWorker = document.getElementById('shiftWorker');
-            shiftWorker.innerHTML = '';
+        function deleteShift(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+                shifts.splice(index, 1);
+                renderShifts();
+            }
+        }
 
-            workers.forEach(worker => {
-                const option = document.createElement('option');
-                option.value = worker.id;
-                option.textContent = worker.name;
-                if (worker.id == selectedWorkerId) {
-                    option.selected = true;
-                }
-                shiftWorker.appendChild(option);
-            });
+        function loadShips() {
+            const shiftShip = document.getElementById('shiftShip');
+            shiftShip.innerHTML = '';
+
+            ships
+                .sort((a, b) => a.priority - b.priority) // Ordena barcos por prioridad
+                .forEach(ship => {
+                    const option = document.createElement('option');
+                    option.value = ship.id;
+                    option.textContent = ship.name;
+                    shiftShip.appendChild(option);
+                });
         }
     </script>
 </body>
@@ -181,7 +188,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortManager - Gestión de Turnos</title>
+    <title>PortManager - Gestión de Turnos Automática</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .hidden { display: none !important; }
@@ -191,7 +198,7 @@
 <body class="bg-gray-100">
     <!-- Gestión de Turnos -->
     <div id="shiftManagement" class="min-h-screen p-8">
-        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos</h1>
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Turnos con Asignación Automática</h1>
         <div class="mb-4">
             <button onclick="addShift()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
                 Añadir Turno
@@ -215,7 +222,7 @@
         </table>
     </div>
 
-    <!-- Modal para Añadir/Editar Turno -->
+    <!-- Modal para Añadir Turno -->
     <div id="shiftModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Turno</h2>
@@ -232,9 +239,8 @@
                     <option value="Descarga">Descarga</option>
                     <option value="Mantenimiento">Mantenimiento</option>
                 </select>
-                <input type="text" id="shiftShip" placeholder="Nombre del Barco" class="w-full p-2 border rounded">
-                <select id="shiftWorker" class="w-full p-2 border rounded">
-                    <!-- Trabajadores disponibles se cargarán aquí -->
+                <select id="shiftShip" class="w-full p-2 border rounded">
+                    <!-- Barcos disponibles se cargarán aquí -->
                 </select>
                 <button onclick="saveShift()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
                     Guardar
@@ -249,9 +255,14 @@
     <script>
         let shifts = [];
         let workers = [
-            { id: 1, name: "Juan Pérez" },
-            { id: 2, name: "María López" },
-            { id: 3, name: "Carlos García" }
+            { id: 1, name: "Juan Pérez", specialty: "Carga", lastShift: null },
+            { id: 2, name: "María López", specialty: "Descarga", lastShift: null },
+            { id: 3, name: "Carlos García", specialty: "Mantenimiento", lastShift: null }
+        ];
+        let ships = [
+            { id: 1, name: "Barco A", priority: 1 },
+            { id: 2, name: "Barco B", priority: 2 },
+            { id: 3, name: "Barco C", priority: 3 }
         ];
         let editingShiftIndex = null;
 
@@ -261,51 +272,49 @@
             document.getElementById('shiftDate').value = '';
             document.getElementById('shiftTime').value = '02-08';
             document.getElementById('shiftSpecialty').value = 'Carga';
-            document.getElementById('shiftShip').value = '';
-            loadWorkers();
+            loadShips();
             document.getElementById('shiftModal').classList.remove('hidden');
-        }
-
-        function editShift(index) {
-            editingShiftIndex = index;
-            document.getElementById('modalTitle').textContent = 'Editar Turno';
-            document.getElementById('shiftDate').value = shifts[index].date;
-            document.getElementById('shiftTime').value = shifts[index].time;
-            document.getElementById('shiftSpecialty').value = shifts[index].specialty;
-            document.getElementById('shiftShip').value = shifts[index].ship;
-            loadWorkers(shifts[index].workerId);
-            document.getElementById('shiftModal').classList.remove('hidden');
-        }
-
-        function deleteShift(index) {
-            if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
-                shifts.splice(index, 1);
-                renderShifts();
-            }
         }
 
         function saveShift() {
             const date = document.getElementById('shiftDate').value;
             const time = document.getElementById('shiftTime').value;
             const specialty = document.getElementById('shiftSpecialty').value;
-            const ship = document.getElementById('shiftShip').value;
-            const workerId = document.getElementById('shiftWorker').value;
+            const shipId = document.getElementById('shiftShip').value;
 
-            if (!date || !time || !specialty || !ship || !workerId) {
+            if (!date || !time || !specialty || !shipId) {
                 alert('Por favor, completa todos los campos.');
                 return;
             }
 
-            const worker = workers.find(w => w.id == workerId);
+            const ship = ships.find(s => s.id == shipId);
+            const worker = assignWorker(specialty);
 
-            if (editingShiftIndex !== null) {
-                shifts[editingShiftIndex] = { date, time, specialty, ship, workerId, workerName: worker.name };
-            } else {
-                shifts.push({ date, time, specialty, ship, workerId, workerName: worker.name });
+            if (!worker) {
+                alert('No hay trabajadores disponibles para esta especialidad.');
+                return;
             }
 
+            const newShift = { date, time, specialty, shipName: ship.name, workerName: worker.name };
+
+            if (editingShiftIndex !== null) {
+                shifts[editingShiftIndex] = newShift;
+            } else {
+                shifts.push(newShift);
+            }
+
+            worker.lastShift = date; // Actualiza la última fecha de turno del trabajador
             closeModal();
             renderShifts();
+        }
+
+        function assignWorker(specialty) {
+            // Filtra trabajadores por especialidad y ordena por la última fecha de turno (rotación)
+            const availableWorkers = workers
+                .filter(worker => worker.specialty === specialty)
+                .sort((a, b) => (a.lastShift || '') > (b.lastShift || '') ? 1 : -1);
+
+            return availableWorkers.length > 0 ? availableWorkers[0] : null;
         }
 
         function closeModal() {
@@ -323,10 +332,9 @@
                     <td class="p-2 text-center">${shift.date}</td>
                     <td class="p-2 text-center">${shift.time}</td>
                     <td class="p-2 text-center">${shift.specialty}</td>
-                    <td class="p-2 text-center">${shift.ship}</td>
+                    <td class="p-2 text-center">${shift.shipName}</td>
                     <td class="p-2 text-center">${shift.workerName}</td>
                     <td class="p-2 text-center">
-                        <button onclick="editShift(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
                         <button onclick="deleteShift(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
                     </td>
                 `;
@@ -334,19 +342,25 @@
             });
         }
 
-        function loadWorkers(selectedWorkerId = null) {
-            const shiftWorker = document.getElementById('shiftWorker');
-            shiftWorker.innerHTML = '';
+        function deleteShift(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+                shifts.splice(index, 1);
+                renderShifts();
+            }
+        }
 
-            workers.forEach(worker => {
-                const option = document.createElement('option');
-                option.value = worker.id;
-                option.textContent = worker.name;
-                if (worker.id == selectedWorkerId) {
-                    option.selected = true;
-                }
-                shiftWorker.appendChild(option);
-            });
+        function loadShips() {
+            const shiftShip = document.getElementById('shiftShip');
+            shiftShip.innerHTML = '';
+
+            ships
+                .sort((a, b) => a.priority - b.priority) // Ordena barcos por prioridad
+                .forEach(ship => {
+                    const option = document.createElement('option');
+                    option.value = ship.id;
+                    option.textContent = ship.name;
+                    shiftShip.appendChild(option);
+                });
         }
     </script>
 </body>
