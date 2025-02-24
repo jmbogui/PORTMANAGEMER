@@ -1,0 +1,200 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Generación de Boletos en PDF</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Generación de Boletos de Contratación en PDF</h1>
+    <div id="ticketContainer">
+        <!-- Los boletos de contratación se generarán aquí -->
+    </div>
+    <button onclick="generateTicket()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Generar Boleto de Contratación
+    </button>
+    <button onclick="downloadPDF()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 ml-4">
+        Descargar Boletos en PDF
+    </button>
+
+    <script>
+        let shifts = [
+            {
+                id: 101,
+                date: "2025-02-25",
+                time: "08-14",
+                shipName: "Barco A",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" },
+                    { name: "Carlos García", specialty: "Gruista" }
+                ]
+            },
+            {
+                id: 102,
+                date: "2025-02-25",
+                time: "14-20",
+                shipName: "Barco B",
+                workers: [
+                    { name: "Ana Torres", specialty: "Amantero" },
+                    { name: "Luis Fernández", specialty: "Carretillero" },
+                    { name: "Sofía Martínez", specialty: "Mafista" }
+                ]
+            }
+        ];
+
+        function generateTicket() {
+            const ticketContainer = document.getElementById('ticketContainer');
+            ticketContainer.innerHTML = ''; // Limpia los boletos anteriores
+
+            shifts.forEach(shift => {
+                const ticket = document.createElement('div');
+                ticket.className = 'ticket border-2 border-dashed border-gray-500 p-4 mb-4 bg-white';
+
+                ticket.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Boleto de Contratación - ID: ${shift.id}</div>
+                    <div class="mt-2">
+                        <p><strong>Barco:</strong> ${shift.shipName}</p>
+                        <p><strong>Fecha:</strong> ${shift.date}</p>
+                        <p><strong>Jornada:</strong> ${shift.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul class="list-disc pl-6">
+                            ${shift.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                ticketContainer.appendChild(ticket);
+            });
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            shifts.forEach((shift, index) => {
+                if (index > 0) pdf.addPage(); // Añade una nueva página para cada boleto
+
+                pdf.setFontSize(16);
+                pdf.text(`Boleto de Contratación - ID: ${shift.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${shift.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${shift.date}`, 10, 30);
+                pdf.text(`Jornada: ${shift.time}`, 10, 40);
+
+                pdf.text("Trabajadores:", 10, 50);
+                shift.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 60 + i * 10);
+                });
+            });
+
+            pdf.save("boletos_contratacion.pdf");
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Generación de Boletos en PDF</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Generación de Boletos de Contratación en PDF</h1>
+    <div id="ticketContainer">
+        <!-- Los boletos de contratación se generarán aquí -->
+    </div>
+    <button onclick="generateTicket()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Generar Boleto de Contratación
+    </button>
+    <button onclick="downloadPDF()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 ml-4">
+        Descargar Boletos en PDF
+    </button>
+
+    <script>
+        let shifts = [
+            {
+                id: 101,
+                date: "2025-02-25",
+                time: "08-14",
+                shipName: "Barco A",
+                workers: [
+                    { name: "Juan Pérez", specialty: "Capataz" },
+                    { name: "María López", specialty: "Controlador" },
+                    { name: "Carlos García", specialty: "Gruista" }
+                ]
+            },
+            {
+                id: 102,
+                date: "2025-02-25",
+                time: "14-20",
+                shipName: "Barco B",
+                workers: [
+                    { name: "Ana Torres", specialty: "Amantero" },
+                    { name: "Luis Fernández", specialty: "Carretillero" },
+                    { name: "Sofía Martínez", specialty: "Mafista" }
+                ]
+            }
+        ];
+
+        function generateTicket() {
+            const ticketContainer = document.getElementById('ticketContainer');
+            ticketContainer.innerHTML = ''; // Limpia los boletos anteriores
+
+            shifts.forEach(shift => {
+                const ticket = document.createElement('div');
+                ticket.className = 'ticket border-2 border-dashed border-gray-500 p-4 mb-4 bg-white';
+
+                ticket.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Boleto de Contratación - ID: ${shift.id}</div>
+                    <div class="mt-2">
+                        <p><strong>Barco:</strong> ${shift.shipName}</p>
+                        <p><strong>Fecha:</strong> ${shift.date}</p>
+                        <p><strong>Jornada:</strong> ${shift.time}</p>
+                        <p><strong>Trabajadores:</strong></p>
+                        <ul class="list-disc pl-6">
+                            ${shift.workers.map(worker => `<li>${worker.name} - ${worker.specialty}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                ticketContainer.appendChild(ticket);
+            });
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            shifts.forEach((shift, index) => {
+                if (index > 0) pdf.addPage(); // Añade una nueva página para cada boleto
+
+                pdf.setFontSize(16);
+                pdf.text(`Boleto de Contratación - ID: ${shift.id}`, 10, 10);
+
+                pdf.setFontSize(12);
+                pdf.text(`Barco: ${shift.shipName}`, 10, 20);
+                pdf.text(`Fecha: ${shift.date}`, 10, 30);
+                pdf.text(`Jornada: ${shift.time}`, 10, 40);
+
+                pdf.text("Trabajadores:", 10, 50);
+                shift.workers.forEach((worker, i) => {
+                    pdf.text(`- ${worker.name} (${worker.specialty})`, 15, 60 + i * 10);
+                });
+            });
+
+            pdf.save("boletos_contratacion.pdf");
+        }
+    </script>
+</body>
+</html>
+```
