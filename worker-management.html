@@ -1,1 +1,253 @@
 
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Trabajadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Gestión de Trabajadores -->
+    <div id="workerManagement" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Trabajadores</h1>
+        <div class="mb-4">
+            <button onclick="addWorker()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                Añadir Trabajador
+            </button>
+        </div>
+        <table class="table-auto w-full bg-white shadow rounded-lg">
+            <thead>
+                <tr class="bg-blue-900 text-white">
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Nombre</th>
+                    <th class="p-2">Especialidad</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="workerTable">
+                <!-- Trabajadores se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Añadir/Editar Trabajador -->
+    <div id="workerModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Trabajador</h2>
+            <div class="space-y-4">
+                <input type="text" id="workerName" placeholder="Nombre" class="w-full p-2 border rounded">
+                <input type="text" id="workerSpecialty" placeholder="Especialidad" class="w-full p-2 border rounded">
+                <button onclick="saveWorker()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Guardar
+                </button>
+                <button onclick="closeModal()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let workers = [];
+        let editingWorkerIndex = null;
+
+        function addWorker() {
+            editingWorkerIndex = null;
+            document.getElementById('modalTitle').textContent = 'Añadir Trabajador';
+            document.getElementById('workerName').value = '';
+            document.getElementById('workerSpecialty').value = '';
+            document.getElementById('workerModal').classList.remove('hidden');
+        }
+
+        function editWorker(index) {
+            editingWorkerIndex = index;
+            document.getElementById('modalTitle').textContent = 'Editar Trabajador';
+            document.getElementById('workerName').value = workers[index].name;
+            document.getElementById('workerSpecialty').value = workers[index].specialty;
+            document.getElementById('workerModal').classList.remove('hidden');
+        }
+
+        function deleteWorker(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este trabajador?')) {
+                workers.splice(index, 1);
+                renderWorkers();
+            }
+        }
+
+        function saveWorker() {
+            const name = document.getElementById('workerName').value;
+            const specialty = document.getElementById('workerSpecialty').value;
+
+            if (!name || !specialty) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            if (editingWorkerIndex !== null) {
+                workers[editingWorkerIndex] = { name, specialty };
+            } else {
+                workers.push({ name, specialty });
+            }
+
+            closeModal();
+            renderWorkers();
+        }
+
+        function closeModal() {
+            document.getElementById('workerModal').classList.add('hidden');
+        }
+
+        function renderWorkers() {
+            const workerTable = document.getElementById('workerTable');
+            workerTable.innerHTML = '';
+
+            workers.forEach((worker, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2 text-center">${index + 1}</td>
+                    <td class="p-2 text-center">${worker.name}</td>
+                    <td class="p-2 text-center">${worker.specialty}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="editWorker(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
+                        <button onclick="deleteWorker(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
+                    </td>
+                `;
+                workerTable.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Trabajadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Gestión de Trabajadores -->
+    <div id="workerManagement" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Trabajadores</h1>
+        <div class="mb-4">
+            <button onclick="addWorker()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                Añadir Trabajador
+            </button>
+        </div>
+        <table class="table-auto w-full bg-white shadow rounded-lg">
+            <thead>
+                <tr class="bg-blue-900 text-white">
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Nombre</th>
+                    <th class="p-2">Especialidad</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="workerTable">
+                <!-- Trabajadores se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Añadir/Editar Trabajador -->
+    <div id="workerModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Trabajador</h2>
+            <div class="space-y-4">
+                <input type="text" id="workerName" placeholder="Nombre" class="w-full p-2 border rounded">
+                <input type="text" id="workerSpecialty" placeholder="Especialidad" class="w-full p-2 border rounded">
+                <button onclick="saveWorker()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Guardar
+                </button>
+                <button onclick="closeModal()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let workers = [];
+        let editingWorkerIndex = null;
+
+        function addWorker() {
+            editingWorkerIndex = null;
+            document.getElementById('modalTitle').textContent = 'Añadir Trabajador';
+            document.getElementById('workerName').value = '';
+            document.getElementById('workerSpecialty').value = '';
+            document.getElementById('workerModal').classList.remove('hidden');
+        }
+
+        function editWorker(index) {
+            editingWorkerIndex = index;
+            document.getElementById('modalTitle').textContent = 'Editar Trabajador';
+            document.getElementById('workerName').value = workers[index].name;
+            document.getElementById('workerSpecialty').value = workers[index].specialty;
+            document.getElementById('workerModal').classList.remove('hidden');
+        }
+
+        function deleteWorker(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este trabajador?')) {
+                workers.splice(index, 1);
+                renderWorkers();
+            }
+        }
+
+        function saveWorker() {
+            const name = document.getElementById('workerName').value;
+            const specialty = document.getElementById('workerSpecialty').value;
+
+            if (!name || !specialty) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            if (editingWorkerIndex !== null) {
+                workers[editingWorkerIndex] = { name, specialty };
+            } else {
+                workers.push({ name, specialty });
+            }
+
+            closeModal();
+            renderWorkers();
+        }
+
+        function closeModal() {
+            document.getElementById('workerModal').classList.add('hidden');
+        }
+
+        function renderWorkers() {
+            const workerTable = document.getElementById('workerTable');
+            workerTable.innerHTML = '';
+
+            workers.forEach((worker, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2 text-center">${index + 1}</td>
+                    <td class="p-2 text-center">${worker.name}</td>
+                    <td class="p-2 text-center">${worker.specialty}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="editWorker(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
+                        <button onclick="deleteWorker(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
+                    </td>
+                `;
+                workerTable.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
+```
