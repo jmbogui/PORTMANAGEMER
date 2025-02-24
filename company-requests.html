@@ -1,0 +1,340 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Solicitudes de Empresas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Gestión de Solicitudes -->
+    <div id="requestManagement" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Solicitudes de Empresas</h1>
+        <div class="mb-4">
+            <button onclick="addRequest()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                Añadir Solicitud
+            </button>
+        </div>
+        <table class="table-auto w-full bg-white shadow rounded-lg">
+            <thead>
+                <tr class="bg-blue-900 text-white">
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Empresa</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Hora</th>
+                    <th class="p-2">Especialidad</th>
+                    <th class="p-2">Barco</th>
+                    <th class="p-2">Estado</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="requestTable">
+                <!-- Solicitudes se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Añadir Solicitud -->
+    <div id="requestModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Solicitud</h2>
+            <div class="space-y-4">
+                <input type="text" id="companyName" placeholder="Nombre de la Empresa" class="w-full p-2 border rounded">
+                <input type="date" id="requestDate" class="w-full p-2 border rounded">
+                <select id="requestTime" class="w-full p-2 border rounded">
+                    <option value="02-08">02:00 - 08:00</option>
+                    <option value="08-14">08:00 - 14:00</option>
+                    <option value="14-20">14:00 - 20:00</option>
+                    <option value="20-02">20:00 - 02:00</option>
+                </select>
+                <select id="requestSpecialty" class="w-full p-2 border rounded">
+                    <option value="Capataz">Capataz</option>
+                    <option value="Controlador">Controlador</option>
+                    <option value="Gruista">Gruista</option>
+                    <option value="Amantero">Amantero</option>
+                    <option value="Carretillero">Carretillero</option>
+                    <option value="Mafista">Mafista</option>
+                </select>
+                <select id="requestShip" class="w-full p-2 border rounded">
+                    <!-- Barcos disponibles se cargarán aquí -->
+                </select>
+                <button onclick="saveRequest()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Guardar
+                </button>
+                <button onclick="closeModal()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let requests = [];
+        let ships = [
+            { id: 1, name: "Barco A", priority: 1 },
+            { id: 2, name: "Barco B", priority: 2 },
+            { id: 3, name: "Barco C", priority: 3 }
+        ];
+        let editingRequestIndex = null;
+
+        function addRequest() {
+            editingRequestIndex = null;
+            document.getElementById('modalTitle').textContent = 'Añadir Solicitud';
+            document.getElementById('companyName').value = '';
+            document.getElementById('requestDate').value = '';
+            document.getElementById('requestTime').value = '02-08';
+            document.getElementById('requestSpecialty').value = 'Capataz';
+            loadShips();
+            document.getElementById('requestModal').classList.remove('hidden');
+        }
+
+        function saveRequest() {
+            const companyName = document.getElementById('companyName').value;
+            const date = document.getElementById('requestDate').value;
+            const time = document.getElementById('requestTime').value;
+            const specialty = document.getElementById('requestSpecialty').value;
+            const shipId = document.getElementById('requestShip').value;
+
+            if (!companyName || !date || !time || !specialty || !shipId) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const ship = ships.find(s => s.id == shipId);
+            const newRequest = { companyName, date, time, specialty, shipName: ship.name, status: "Pendiente" };
+
+            if (editingRequestIndex !== null) {
+                requests[editingRequestIndex] = newRequest;
+            } else {
+                requests.push(newRequest);
+            }
+
+            closeModal();
+            renderRequests();
+        }
+
+        function closeModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+        }
+
+        function renderRequests() {
+            const requestTable = document.getElementById('requestTable');
+            requestTable.innerHTML = '';
+
+            requests.forEach((request, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2 text-center">${index + 1}</td>
+                    <td class="p-2 text-center">${request.companyName}</td>
+                    <td class="p-2 text-center">${request.date}</td>
+                    <td class="p-2 text-center">${request.time}</td>
+                    <td class="p-2 text-center">${request.specialty}</td>
+                    <td class="p-2 text-center">${request.shipName}</td>
+                    <td class="p-2 text-center">${request.status}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="deleteRequest(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
+                    </td>
+                `;
+                requestTable.appendChild(row);
+            });
+        }
+
+        function deleteRequest(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta solicitud?')) {
+                requests.splice(index, 1);
+                renderRequests();
+            }
+        }
+
+        function loadShips() {
+            const requestShip = document.getElementById('requestShip');
+            requestShip.innerHTML = '';
+
+            ships
+                .sort((a, b) => a.priority - b.priority) // Ordena barcos por prioridad
+                .forEach(ship => {
+                    const option = document.createElement('option');
+                    option.value = ship.id;
+                    option.textContent = ship.name;
+                    requestShip.appendChild(option);
+                });
+        }
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Gestión de Solicitudes de Empresas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Gestión de Solicitudes -->
+    <div id="requestManagement" class="min-h-screen p-8">
+        <h1 class="text-3xl font-bold text-blue-900 mb-4">Gestión de Solicitudes de Empresas</h1>
+        <div class="mb-4">
+            <button onclick="addRequest()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                Añadir Solicitud
+            </button>
+        </div>
+        <table class="table-auto w-full bg-white shadow rounded-lg">
+            <thead>
+                <tr class="bg-blue-900 text-white">
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Empresa</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Hora</th>
+                    <th class="p-2">Especialidad</th>
+                    <th class="p-2">Barco</th>
+                    <th class="p-2">Estado</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="requestTable">
+                <!-- Solicitudes se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Añadir Solicitud -->
+    <div id="requestModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Solicitud</h2>
+            <div class="space-y-4">
+                <input type="text" id="companyName" placeholder="Nombre de la Empresa" class="w-full p-2 border rounded">
+                <input type="date" id="requestDate" class="w-full p-2 border rounded">
+                <select id="requestTime" class="w-full p-2 border rounded">
+                    <option value="02-08">02:00 - 08:00</option>
+                    <option value="08-14">08:00 - 14:00</option>
+                    <option value="14-20">14:00 - 20:00</option>
+                    <option value="20-02">20:00 - 02:00</option>
+                </select>
+                <select id="requestSpecialty" class="w-full p-2 border rounded">
+                    <option value="Capataz">Capataz</option>
+                    <option value="Controlador">Controlador</option>
+                    <option value="Gruista">Gruista</option>
+                    <option value="Amantero">Amantero</option>
+                    <option value="Carretillero">Carretillero</option>
+                    <option value="Mafista">Mafista</option>
+                </select>
+                <select id="requestShip" class="w-full p-2 border rounded">
+                    <!-- Barcos disponibles se cargarán aquí -->
+                </select>
+                <button onclick="saveRequest()" class="w-full bg-blue-900 text-white p-2 rounded hover:bg-blue-800">
+                    Guardar
+                </button>
+                <button onclick="closeModal()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let requests = [];
+        let ships = [
+            { id: 1, name: "Barco A", priority: 1 },
+            { id: 2, name: "Barco B", priority: 2 },
+            { id: 3, name: "Barco C", priority: 3 }
+        ];
+        let editingRequestIndex = null;
+
+        function addRequest() {
+            editingRequestIndex = null;
+            document.getElementById('modalTitle').textContent = 'Añadir Solicitud';
+            document.getElementById('companyName').value = '';
+            document.getElementById('requestDate').value = '';
+            document.getElementById('requestTime').value = '02-08';
+            document.getElementById('requestSpecialty').value = 'Capataz';
+            loadShips();
+            document.getElementById('requestModal').classList.remove('hidden');
+        }
+
+        function saveRequest() {
+            const companyName = document.getElementById('companyName').value;
+            const date = document.getElementById('requestDate').value;
+            const time = document.getElementById('requestTime').value;
+            const specialty = document.getElementById('requestSpecialty').value;
+            const shipId = document.getElementById('requestShip').value;
+
+            if (!companyName || !date || !time || !specialty || !shipId) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const ship = ships.find(s => s.id == shipId);
+            const newRequest = { companyName, date, time, specialty, shipName: ship.name, status: "Pendiente" };
+
+            if (editingRequestIndex !== null) {
+                requests[editingRequestIndex] = newRequest;
+            } else {
+                requests.push(newRequest);
+            }
+
+            closeModal();
+            renderRequests();
+        }
+
+        function closeModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+        }
+
+        function renderRequests() {
+            const requestTable = document.getElementById('requestTable');
+            requestTable.innerHTML = '';
+
+            requests.forEach((request, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2 text-center">${index + 1}</td>
+                    <td class="p-2 text-center">${request.companyName}</td>
+                    <td class="p-2 text-center">${request.date}</td>
+                    <td class="p-2 text-center">${request.time}</td>
+                    <td class="p-2 text-center">${request.specialty}</td>
+                    <td class="p-2 text-center">${request.shipName}</td>
+                    <td class="p-2 text-center">${request.status}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="deleteRequest(${index})" class="bg-red-500 text-white p-1 rounded hover:bg-red-600">Eliminar</button>
+                    </td>
+                `;
+                requestTable.appendChild(row);
+            });
+        }
+
+        function deleteRequest(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta solicitud?')) {
+                requests.splice(index, 1);
+                renderRequests();
+            }
+        }
+
+        function loadShips() {
+            const requestShip = document.getElementById('requestShip');
+            requestShip.innerHTML = '';
+
+            ships
+                .sort((a, b) => a.priority - b.priority) // Ordena barcos por prioridad
+                .forEach(ship => {
+                    const option = document.createElement('option');
+                    option.value = ship.id;
+                    option.textContent = ship.name;
+                    requestShip.appendChild(option);
+                });
+        }
+    </script>
+</body>
+</html>
+```
