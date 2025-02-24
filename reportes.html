@@ -1,0 +1,283 @@
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Reportes</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Reportes y Estadísticas</h1>
+
+        <!-- Resumen de estadísticas -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 shadow rounded">
+                <h2 class="text-lg font-bold">Turnos Asignados</h2>
+                <p id="totalShifts" class="text-2xl font-bold text-blue-500">0</p>
+            </div>
+            <div class="bg-white p-4 shadow rounded">
+                <h2 class="text-lg font-bold">Trabajadores Activos</h2>
+                <p id="activeWorkers" class="text-2xl font-bold text-green-500">0</p>
+            </div>
+            <div class="bg-white p-4 shadow rounded">
+                <h2 class="text-lg font-bold">Movimientos Realizados</h2>
+                <p id="totalMovements" class="text-2xl font-bold text-purple-500">0</p>
+            </div>
+        </div>
+
+        <!-- Tabla de reportes -->
+        <table class="table-auto w-full border-collapse border border-gray-400 mb-6">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-400 px-4 py-2">Barco</th>
+                    <th class="border border-gray-400 px-4 py-2">Fecha</th>
+                    <th class="border border-gray-400 px-4 py-2">Jornada</th>
+                    <th class="border border-gray-400 px-4 py-2">Trabajadores</th>
+                    <th class="border border-gray-400 px-4 py-2">Movimientos</th>
+                </tr>
+            </thead>
+            <tbody id="reportTable">
+                <!-- Reportes generados dinámicamente -->
+            </tbody>
+        </table>
+
+        <!-- Botones de exportación -->
+        <div class="flex justify-end space-x-4">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="exportToPDF()">Exportar a PDF</button>
+            <button class="bg-green-500 text-white px-4 py-2 rounded" onclick="exportToExcel()">Exportar a Excel</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const reports = [
+            {
+                barco: "Barco A",
+                fecha: "2025-02-27",
+                jornada: "08:00 - 14:00",
+                trabajadores: ["Juan Pérez", "María López", "Carlos García"],
+                movimientos: "50 contenedores"
+            },
+            {
+                barco: "Barco B",
+                fecha: "2025-02-28",
+                jornada: "14:00 - 20:00",
+                trabajadores: ["Ana Torres", "Luis Martínez", "Sofía Gómez"],
+                movimientos: "30 contenedores"
+            }
+        ];
+
+        // Renderizar estadísticas
+        function renderStatistics() {
+            const totalShifts = reports.length;
+            const activeWorkers = new Set(reports.flatMap(report => report.trabajadores)).size;
+            const totalMovements = reports.reduce((sum, report) => {
+                const match = report.movimientos.match(/\d+/);
+                return sum + (match ? parseInt(match[0]) : 0);
+            }, 0);
+
+            document.getElementById("totalShifts").textContent = totalShifts;
+            document.getElementById("activeWorkers").textContent = activeWorkers;
+            document.getElementById("totalMovements").textContent = totalMovements;
+        }
+
+        // Renderizar tabla de reportes
+        function renderReports() {
+            const reportTable = document.getElementById("reportTable");
+            reportTable.innerHTML = ""; // Limpiar tabla
+
+            reports.forEach(report => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border border-gray-400 px-4 py-2">${report.barco}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.fecha}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.jornada}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.trabajadores.join(", ")}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.movimientos}</td>
+                `;
+                reportTable.appendChild(row);
+            });
+        }
+
+        // Exportar a PDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 10;
+
+            doc.text("Reportes de Turnos", 10, y);
+            y += 10;
+
+            reports.forEach(report => {
+                doc.text(`Barco: ${report.barco}`, 10, y);
+                doc.text(`Fecha: ${report.fecha}`, 10, y + 10);
+                doc.text(`Jornada: ${report.jornada}`, 10, y + 20);
+                doc.text(`Trabajadores: ${report.trabajadores.join(", ")}`, 10, y + 30);
+                doc.text(`Movimientos: ${report.movimientos}`, 10, y + 40);
+                y += 50;
+            });
+
+            doc.save("reportes.pdf");
+        }
+
+        // Exportar a Excel
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(reports);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Reportes");
+            XLSX.writeFile(workbook, "reportes.xlsx");
+        }
+
+        // Inicializar
+        renderStatistics();
+        renderReports();
+    </script>
+</body>
+</html>
+```
+```
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortManager - Reportes</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6">Reportes y Estadísticas</h1>
+
+        <!-- Resumen de estadísticas -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 shadow rounded">
+                <h2 class="text-lg font-bold">Turnos Asignados</h2>
+                <p id="totalShifts" class="text-2xl font-bold text-blue-500">0</p>
+            </div>
+            <div class="bg-white p-4 shadow rounded">
+                <h2 class="text-lg font-bold">Trabajadores Activos</h2>
+                <p id="activeWorkers" class="text-2xl font-bold text-green-500">0</p>
+            </div>
+            <div class="bg-white p-4 shadow rounded">
+                <h2 class="text-lg font-bold">Movimientos Realizados</h2>
+                <p id="totalMovements" class="text-2xl font-bold text-purple-500">0</p>
+            </div>
+        </div>
+
+        <!-- Tabla de reportes -->
+        <table class="table-auto w-full border-collapse border border-gray-400 mb-6">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-400 px-4 py-2">Barco</th>
+                    <th class="border border-gray-400 px-4 py-2">Fecha</th>
+                    <th class="border border-gray-400 px-4 py-2">Jornada</th>
+                    <th class="border border-gray-400 px-4 py-2">Trabajadores</th>
+                    <th class="border border-gray-400 px-4 py-2">Movimientos</th>
+                </tr>
+            </thead>
+            <tbody id="reportTable">
+                <!-- Reportes generados dinámicamente -->
+            </tbody>
+        </table>
+
+        <!-- Botones de exportación -->
+        <div class="flex justify-end space-x-4">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="exportToPDF()">Exportar a PDF</button>
+            <button class="bg-green-500 text-white px-4 py-2 rounded" onclick="exportToExcel()">Exportar a Excel</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const reports = [
+            {
+                barco: "Barco A",
+                fecha: "2025-02-27",
+                jornada: "08:00 - 14:00",
+                trabajadores: ["Juan Pérez", "María López", "Carlos García"],
+                movimientos: "50 contenedores"
+            },
+            {
+                barco: "Barco B",
+                fecha: "2025-02-28",
+                jornada: "14:00 - 20:00",
+                trabajadores: ["Ana Torres", "Luis Martínez", "Sofía Gómez"],
+                movimientos: "30 contenedores"
+            }
+        ];
+
+        // Renderizar estadísticas
+        function renderStatistics() {
+            const totalShifts = reports.length;
+            const activeWorkers = new Set(reports.flatMap(report => report.trabajadores)).size;
+            const totalMovements = reports.reduce((sum, report) => {
+                const match = report.movimientos.match(/\d+/);
+                return sum + (match ? parseInt(match[0]) : 0);
+            }, 0);
+
+            document.getElementById("totalShifts").textContent = totalShifts;
+            document.getElementById("activeWorkers").textContent = activeWorkers;
+            document.getElementById("totalMovements").textContent = totalMovements;
+        }
+
+        // Renderizar tabla de reportes
+        function renderReports() {
+            const reportTable = document.getElementById("reportTable");
+            reportTable.innerHTML = ""; // Limpiar tabla
+
+            reports.forEach(report => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border border-gray-400 px-4 py-2">${report.barco}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.fecha}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.jornada}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.trabajadores.join(", ")}</td>
+                    <td class="border border-gray-400 px-4 py-2">${report.movimientos}</td>
+                `;
+                reportTable.appendChild(row);
+            });
+        }
+
+        // Exportar a PDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 10;
+
+            doc.text("Reportes de Turnos", 10, y);
+            y += 10;
+
+            reports.forEach(report => {
+                doc.text(`Barco: ${report.barco}`, 10, y);
+                doc.text(`Fecha: ${report.fecha}`, 10, y + 10);
+                doc.text(`Jornada: ${report.jornada}`, 10, y + 20);
+                doc.text(`Trabajadores: ${report.trabajadores.join(", ")}`, 10, y + 30);
+                doc.text(`Movimientos: ${report.movimientos}`, 10, y + 40);
+                y += 50;
+            });
+
+            doc.save("reportes.pdf");
+        }
+
+        // Exportar a Excel
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(reports);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Reportes");
+            XLSX.writeFile(workbook, "reportes.xlsx");
+        }
+
+        // Inicializar
+        renderStatistics();
+        renderReports();
+    </script>
+</body>
+</html>
+```
