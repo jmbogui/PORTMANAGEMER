@@ -26,6 +26,8 @@
                     <th class="p-2">ID</th>
                     <th class="p-2">Fecha</th>
                     <th class="p-2">Hora</th>
+                    <th class="p-2">Especialidad</th>
+                    <th class="p-2">Barco</th>
                     <th class="p-2">Trabajador</th>
                     <th class="p-2">Acciones</th>
                 </tr>
@@ -42,7 +44,18 @@
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Turno</h2>
             <div class="space-y-4">
                 <input type="date" id="shiftDate" class="w-full p-2 border rounded">
-                <input type="time" id="shiftTime" class="w-full p-2 border rounded">
+                <select id="shiftTime" class="w-full p-2 border rounded">
+                    <option value="02-08">02:00 - 08:00</option>
+                    <option value="08-14">08:00 - 14:00</option>
+                    <option value="14-20">14:00 - 20:00</option>
+                    <option value="20-02">20:00 - 02:00</option>
+                </select>
+                <select id="shiftSpecialty" class="w-full p-2 border rounded">
+                    <option value="Carga">Carga</option>
+                    <option value="Descarga">Descarga</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+                <input type="text" id="shiftShip" placeholder="Nombre del Barco" class="w-full p-2 border rounded">
                 <select id="shiftWorker" class="w-full p-2 border rounded">
                     <!-- Trabajadores disponibles se cargarán aquí -->
                 </select>
@@ -69,7 +82,9 @@
             editingShiftIndex = null;
             document.getElementById('modalTitle').textContent = 'Añadir Turno';
             document.getElementById('shiftDate').value = '';
-            document.getElementById('shiftTime').value = '';
+            document.getElementById('shiftTime').value = '02-08';
+            document.getElementById('shiftSpecialty').value = 'Carga';
+            document.getElementById('shiftShip').value = '';
             loadWorkers();
             document.getElementById('shiftModal').classList.remove('hidden');
         }
@@ -79,6 +94,8 @@
             document.getElementById('modalTitle').textContent = 'Editar Turno';
             document.getElementById('shiftDate').value = shifts[index].date;
             document.getElementById('shiftTime').value = shifts[index].time;
+            document.getElementById('shiftSpecialty').value = shifts[index].specialty;
+            document.getElementById('shiftShip').value = shifts[index].ship;
             loadWorkers(shifts[index].workerId);
             document.getElementById('shiftModal').classList.remove('hidden');
         }
@@ -93,9 +110,11 @@
         function saveShift() {
             const date = document.getElementById('shiftDate').value;
             const time = document.getElementById('shiftTime').value;
+            const specialty = document.getElementById('shiftSpecialty').value;
+            const ship = document.getElementById('shiftShip').value;
             const workerId = document.getElementById('shiftWorker').value;
 
-            if (!date || !time || !workerId) {
+            if (!date || !time || !specialty || !ship || !workerId) {
                 alert('Por favor, completa todos los campos.');
                 return;
             }
@@ -103,9 +122,9 @@
             const worker = workers.find(w => w.id == workerId);
 
             if (editingShiftIndex !== null) {
-                shifts[editingShiftIndex] = { date, time, workerId, workerName: worker.name };
+                shifts[editingShiftIndex] = { date, time, specialty, ship, workerId, workerName: worker.name };
             } else {
-                shifts.push({ date, time, workerId, workerName: worker.name });
+                shifts.push({ date, time, specialty, ship, workerId, workerName: worker.name });
             }
 
             closeModal();
@@ -126,6 +145,8 @@
                     <td class="p-2 text-center">${index + 1}</td>
                     <td class="p-2 text-center">${shift.date}</td>
                     <td class="p-2 text-center">${shift.time}</td>
+                    <td class="p-2 text-center">${shift.specialty}</td>
+                    <td class="p-2 text-center">${shift.ship}</td>
                     <td class="p-2 text-center">${shift.workerName}</td>
                     <td class="p-2 text-center">
                         <button onclick="editShift(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
@@ -182,6 +203,8 @@
                     <th class="p-2">ID</th>
                     <th class="p-2">Fecha</th>
                     <th class="p-2">Hora</th>
+                    <th class="p-2">Especialidad</th>
+                    <th class="p-2">Barco</th>
                     <th class="p-2">Trabajador</th>
                     <th class="p-2">Acciones</th>
                 </tr>
@@ -198,7 +221,18 @@
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Añadir Turno</h2>
             <div class="space-y-4">
                 <input type="date" id="shiftDate" class="w-full p-2 border rounded">
-                <input type="time" id="shiftTime" class="w-full p-2 border rounded">
+                <select id="shiftTime" class="w-full p-2 border rounded">
+                    <option value="02-08">02:00 - 08:00</option>
+                    <option value="08-14">08:00 - 14:00</option>
+                    <option value="14-20">14:00 - 20:00</option>
+                    <option value="20-02">20:00 - 02:00</option>
+                </select>
+                <select id="shiftSpecialty" class="w-full p-2 border rounded">
+                    <option value="Carga">Carga</option>
+                    <option value="Descarga">Descarga</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+                <input type="text" id="shiftShip" placeholder="Nombre del Barco" class="w-full p-2 border rounded">
                 <select id="shiftWorker" class="w-full p-2 border rounded">
                     <!-- Trabajadores disponibles se cargarán aquí -->
                 </select>
@@ -225,7 +259,9 @@
             editingShiftIndex = null;
             document.getElementById('modalTitle').textContent = 'Añadir Turno';
             document.getElementById('shiftDate').value = '';
-            document.getElementById('shiftTime').value = '';
+            document.getElementById('shiftTime').value = '02-08';
+            document.getElementById('shiftSpecialty').value = 'Carga';
+            document.getElementById('shiftShip').value = '';
             loadWorkers();
             document.getElementById('shiftModal').classList.remove('hidden');
         }
@@ -235,6 +271,8 @@
             document.getElementById('modalTitle').textContent = 'Editar Turno';
             document.getElementById('shiftDate').value = shifts[index].date;
             document.getElementById('shiftTime').value = shifts[index].time;
+            document.getElementById('shiftSpecialty').value = shifts[index].specialty;
+            document.getElementById('shiftShip').value = shifts[index].ship;
             loadWorkers(shifts[index].workerId);
             document.getElementById('shiftModal').classList.remove('hidden');
         }
@@ -249,9 +287,11 @@
         function saveShift() {
             const date = document.getElementById('shiftDate').value;
             const time = document.getElementById('shiftTime').value;
+            const specialty = document.getElementById('shiftSpecialty').value;
+            const ship = document.getElementById('shiftShip').value;
             const workerId = document.getElementById('shiftWorker').value;
 
-            if (!date || !time || !workerId) {
+            if (!date || !time || !specialty || !ship || !workerId) {
                 alert('Por favor, completa todos los campos.');
                 return;
             }
@@ -259,9 +299,9 @@
             const worker = workers.find(w => w.id == workerId);
 
             if (editingShiftIndex !== null) {
-                shifts[editingShiftIndex] = { date, time, workerId, workerName: worker.name };
+                shifts[editingShiftIndex] = { date, time, specialty, ship, workerId, workerName: worker.name };
             } else {
-                shifts.push({ date, time, workerId, workerName: worker.name });
+                shifts.push({ date, time, specialty, ship, workerId, workerName: worker.name });
             }
 
             closeModal();
@@ -282,6 +322,8 @@
                     <td class="p-2 text-center">${index + 1}</td>
                     <td class="p-2 text-center">${shift.date}</td>
                     <td class="p-2 text-center">${shift.time}</td>
+                    <td class="p-2 text-center">${shift.specialty}</td>
+                    <td class="p-2 text-center">${shift.ship}</td>
                     <td class="p-2 text-center">${shift.workerName}</td>
                     <td class="p-2 text-center">
                         <button onclick="editShift(${index})" class="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600">Editar</button>
