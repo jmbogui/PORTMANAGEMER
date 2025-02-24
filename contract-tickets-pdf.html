@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortManager - Generación de Boletos en PDF</title>
+    <title>PortManager - Generación de Peticiones en PDF</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 p-8">
-    <h1 class="text-3xl font-bold text-blue-900 mb-4">Generación de Boletos de Contratación en PDF</h1>
-    <div id="ticketContainer">
-        <!-- Los boletos de contratación se generarán aquí -->
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Generación de Peticiones en PDF</h1>
+    <div id="requestContainer">
+        <!-- Las peticiones se generarán aquí -->
     </div>
-    <button onclick="generateTicket()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
-        Generar Boleto de Contratación
+    <button onclick="generateRequest()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Generar Petición
     </button>
     <button onclick="downloadPDF()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 ml-4">
-        Descargar Boletos en PDF
+        Descargar Peticiones en PDF
     </button>
 
     <script>
@@ -46,16 +46,16 @@
             }
         ];
 
-        function generateTicket() {
-            const ticketContainer = document.getElementById('ticketContainer');
-            ticketContainer.innerHTML = ''; // Limpia los boletos anteriores
+        function generateRequest() {
+            const requestContainer = document.getElementById('requestContainer');
+            requestContainer.innerHTML = ''; // Limpia las peticiones anteriores
 
             shifts.forEach(shift => {
-                const ticket = document.createElement('div');
-                ticket.className = 'ticket border-2 border-dashed border-gray-500 p-4 mb-4 bg-white';
+                const request = document.createElement('div');
+                request.className = 'request border-2 border-dashed border-gray-500 p-4 mb-4 bg-white';
 
-                ticket.innerHTML = `
-                    <div class="text-lg font-bold text-gray-700">Boleto de Contratación - ID: ${shift.id}</div>
+                request.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Petición - ID: ${shift.id}</div>
                     <div class="mt-2">
                         <p><strong>Barco:</strong> ${shift.shipName}</p>
                         <p><strong>Fecha:</strong> ${shift.date}</p>
@@ -67,7 +67,7 @@
                     </div>
                 `;
 
-                ticketContainer.appendChild(ticket);
+                requestContainer.appendChild(request);
             });
         }
 
@@ -76,10 +76,10 @@
             const pdf = new jsPDF();
 
             shifts.forEach((shift, index) => {
-                if (index > 0) pdf.addPage(); // Añade una nueva página para cada boleto
+                if (index > 0) pdf.addPage(); // Añade una nueva página para cada petición
 
                 pdf.setFontSize(16);
-                pdf.text(`Boleto de Contratación - ID: ${shift.id}`, 10, 10);
+                pdf.text(`Petición - ID: ${shift.id}`, 10, 10);
 
                 pdf.setFontSize(12);
                 pdf.text(`Barco: ${shift.shipName}`, 10, 20);
@@ -92,7 +92,7 @@
                 });
             });
 
-            pdf.save("boletos_contratacion.pdf");
+            pdf.save("peticiones.pdf");
         }
     </script>
 </body>
@@ -104,20 +104,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortManager - Generación de Boletos en PDF</title>
+    <title>PortManager - Generación de Peticiones en PDF</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 p-8">
-    <h1 class="text-3xl font-bold text-blue-900 mb-4">Generación de Boletos de Contratación en PDF</h1>
-    <div id="ticketContainer">
-        <!-- Los boletos de contratación se generarán aquí -->
+    <h1 class="text-3xl font-bold text-blue-900 mb-4">Generación de Peticiones en PDF</h1>
+    <div id="requestContainer">
+        <!-- Las peticiones se generarán aquí -->
     </div>
-    <button onclick="generateTicket()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
-        Generar Boleto de Contratación
+    <button onclick="generateRequest()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Generar Petición
     </button>
     <button onclick="downloadPDF()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 ml-4">
-        Descargar Boletos en PDF
+        Descargar Peticiones en PDF
     </button>
 
     <script>
@@ -146,16 +146,16 @@
             }
         ];
 
-        function generateTicket() {
-            const ticketContainer = document.getElementById('ticketContainer');
-            ticketContainer.innerHTML = ''; // Limpia los boletos anteriores
+        function generateRequest() {
+            const requestContainer = document.getElementById('requestContainer');
+            requestContainer.innerHTML = ''; // Limpia las peticiones anteriores
 
             shifts.forEach(shift => {
-                const ticket = document.createElement('div');
-                ticket.className = 'ticket border-2 border-dashed border-gray-500 p-4 mb-4 bg-white';
+                const request = document.createElement('div');
+                request.className = 'request border-2 border-dashed border-gray-500 p-4 mb-4 bg-white';
 
-                ticket.innerHTML = `
-                    <div class="text-lg font-bold text-gray-700">Boleto de Contratación - ID: ${shift.id}</div>
+                request.innerHTML = `
+                    <div class="text-lg font-bold text-gray-700">Petición - ID: ${shift.id}</div>
                     <div class="mt-2">
                         <p><strong>Barco:</strong> ${shift.shipName}</p>
                         <p><strong>Fecha:</strong> ${shift.date}</p>
@@ -167,7 +167,7 @@
                     </div>
                 `;
 
-                ticketContainer.appendChild(ticket);
+                requestContainer.appendChild(request);
             });
         }
 
@@ -176,10 +176,10 @@
             const pdf = new jsPDF();
 
             shifts.forEach((shift, index) => {
-                if (index > 0) pdf.addPage(); // Añade una nueva página para cada boleto
+                if (index > 0) pdf.addPage(); // Añade una nueva página para cada petición
 
                 pdf.setFontSize(16);
-                pdf.text(`Boleto de Contratación - ID: ${shift.id}`, 10, 10);
+                pdf.text(`Petición - ID: ${shift.id}`, 10, 10);
 
                 pdf.setFontSize(12);
                 pdf.text(`Barco: ${shift.shipName}`, 10, 20);
@@ -192,7 +192,7 @@
                 });
             });
 
-            pdf.save("boletos_contratacion.pdf");
+            pdf.save("peticiones.pdf");
         }
     </script>
 </body>
