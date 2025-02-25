@@ -1,140 +1,53 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortManager - Menú Principal</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
         }
         .menu-container {
             max-width: 600px;
             margin: 50px auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .menu-header {
+        .menu-container h1 {
             text-align: center;
-            margin-bottom: 20px;
+            color: #333;
         }
-        .menu-header h1 {
-            font-size: 1.8rem;
-            color: #4CAF50;
+        .menu-container ul {
+            list-style: none;
+            padding: 0;
         }
-        .menu-header p {
-            font-size: 0.9rem;
-            color: #666;
+        .menu-container ul li {
+            margin: 10px 0;
         }
-        .menu-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .menu-options a {
-            display: block;
-            text-align: center;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
+        .menu-container ul li a {
             text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            color: #007bff;
+            font-size: 18px;
         }
-        .menu-options a:hover {
-            background-color: #45a049;
+        .menu-container ul li a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <div class="menu-container">
-        <div class="menu-header">
-            <h1>PortManager</h1>
-            <p>Seleccione una opción para gestionar el sistema</p>
-        </div>
-        <div class="menu-options">
-            <a href="worker-management.html">Gestión de Trabajadores</a>
-            <a href="shift-management.html">Gestión de Turnos</a>
-            <a href="adorned-reports.html">Reportes y Estadísticas</a>
-            <a href="settings.html">Configuración</a>
-        </div>
+        <h1>Menú Principal</h1>
+        <ul>
+            <li><a href="worker-management.html">Gestión de Trabajadores</a></li>
+            <li><a href="shift-management.html">Gestión de Turnos</a></li>
+            <li><a href="adorned-reports.html">Reportes y Estadísticas</a></li>
+        </ul>
     </div>
 </body>
 </html>
-```
-```
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortManager - Menú Principal</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-        }
-        .menu-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-        .menu-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .menu-header h1 {
-            font-size: 1.8rem;
-            color: #4CAF50;
-        }
-        .menu-header p {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        .menu-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .menu-options a {
-            display: block;
-            text-align: center;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .menu-options a:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body class="bg-gray-100">
-    <div class="menu-container">
-        <div class="menu-header">
-            <h1>PortManager</h1>
-            <p>Seleccione una opción para gestionar el sistema</p>
-        </div>
-        <div class="menu-options">
-            <a href="worker-management.html">Gestión de Trabajadores</a>
-            <a href="shift-management.html">Gestión de Turnos</a>
-            <a href="adorned-reports.html">Reportes y Estadísticas</a>
-            <a href="settings.html">Configuración</a>
-        </div>
-    </div>
-</body>
-</html>
-```
